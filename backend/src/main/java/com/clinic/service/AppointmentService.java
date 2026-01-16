@@ -8,6 +8,7 @@ import com.clinic.repository.DoctorRepository;
 import com.clinic.repository.PatientRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -43,13 +44,34 @@ public class AppointmentService {
         return appointmentRepository.findByDoctorId(doctorId);
     }
 
-    public List<Appointment> getAppointmentsByDate(LocalDateTime date) {
-        LocalDateTime start = date.toLocalDate().atStartOfDay();
-        LocalDateTime end = start.plusDays(1);
-        return appointmentRepository.findByAppointmentTimeBetween(start, end);
+    /**
+     * Q6 Requirement: Retrieve appointments for a doctor on a specific date
+     * 
+     * @param doctorId Doctor ID
+     * @param date     Date to check
+     * @return List of appointments for that doctor on that date
+     */
+    public List<Appointment> getAppointmentsForDoctorOnDate(Long doctorId, LocalDate date) {
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
+
+        return appointmentRepository.findByDoctorId(doctorId).stream()
+                .filter(a -> a.getAppointmentTime() != null)
+                .filter(a -> !a.getAppointmentTime().isBefore(startOfDay) &&
+                        a.getAppointmentTime().isBefore(endOfDay))
+                .toList();
     }
 
-    public Appointment createAppointment(Long patientId, Long doctorId, LocalDateTime appointmentTime, String notes) {
+    /**
+     * Q6 Requirement: Booking method that saves an appointment
+     * 
+     * @param patientId       Patient ID
+     * @param doctorId        Doctor ID
+     * @param appointmentTime Appointment date and time
+     * @param notes           Additional notes
+     * @return Saved appointment
+     */
+    public Appointment bookAppointment(Long patientId, Long doctorId, LocalDateTime appointmentTime, String notes) {
         Patient patient = patientRepository.findById(patientId)
                 .orElseThrow(() -> new RuntimeException("Patient not found"));
         Doctor doctor = doctorRepository.findById(doctorId)

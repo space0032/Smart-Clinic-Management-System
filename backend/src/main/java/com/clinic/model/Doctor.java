@@ -3,6 +3,8 @@ package com.clinic.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import java.time.LocalTime;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -29,6 +31,12 @@ public class Doctor {
 
     @Column
     private boolean available = true;
+
+    // Q3 Requirement: availableTimes field with proper annotation
+    @ElementCollection
+    @CollectionTable(name = "doctor_available_times", joinColumns = @JoinColumn(name = "doctor_id"))
+    @Column(name = "available_time")
+    private List<LocalTime> availableTimes;
 
     // Default Constructor
     public Doctor() {
@@ -91,6 +99,14 @@ public class Doctor {
 
     public void setAvailable(boolean available) {
         this.available = available;
+    }
+
+    public List<LocalTime> getAvailableTimes() {
+        return availableTimes;
+    }
+
+    public void setAvailableTimes(List<LocalTime> availableTimes) {
+        this.availableTimes = availableTimes;
     }
 
     @Override
