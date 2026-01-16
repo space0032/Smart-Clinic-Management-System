@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Pill, Plus, Search, Trash2, Eye, FileText } from 'lucide-react';
+import { Pill, Plus, Search, Trash2, Eye, FileText, Printer } from 'lucide-react';
 
 export default function Prescriptions() {
     const [prescriptions, setPrescriptions] = useState([]);
@@ -11,11 +11,14 @@ export default function Prescriptions() {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedPrescription, setSelectedPrescription] = useState(null);
 
+    const [medicationList, setMedicationList] = useState([
+        { name: '', dosage: '', frequency: '', duration: '' }
+    ]);
+
     const [formData, setFormData] = useState({
         patientId: '',
         doctorId: '',
         diagnosis: '',
-        medications: '',
         instructions: '',
         validDays: 30
     });
@@ -45,10 +48,20 @@ export default function Prescriptions() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Format medications list into string for backend
+        const formattedMedications = medicationList
+            .filter(m => m.name.trim()) // Only include rows with a name
+            .map((m, index) => `${index + 1}. ${m.name} (${m.dosage}) - ${m.frequency} - ${m.duration}`)
+            .join('\n');
+
+        const payload = { ...formData, medications: formattedMedications };
+
         try {
-            await axios.post(API_URL, formData);
+            await axios.post(API_URL, payload);
             setShowForm(false);
-            setFormData({ patientId: '', doctorId: '', diagnosis: '', medications: '', instructions: '', validDays: 30 });
+            setFormData({ patientId: '', doctorId: '', diagnosis: '', instructions: '', validDays: 30 });
+            setMedicationList([{ name: '', dosage: '', frequency: '', duration: '' }]);
             fetchData();
         } catch (error) {
             console.error('Error creating prescription:', error);
@@ -134,16 +147,83 @@ export default function Prescriptions() {
                             value={formData.diagnosis}
                             onChange={e => setFormData({ ...formData, diagnosis: e.target.value })}
                         />
+                        <div className="md:col-span-2 space-y-3">
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Prescribed Medications</label>
+                            {medicationList.map((med, index) => (
+                                <div key={index} className="flex gap-2 items-start bg-slate-50 dark:bg-slate-700/50 p-3 rounded-lg">
+                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-2 flex-1">
+                                        <input
+                                            type="text"
+                                            placeholder="Medicine Name"
+                                            className="p-2 border border-slate-200 dark:border-slate-600 rounded-md text-sm dark:bg-slate-700 dark:text-slate-100"
+                                            value={med.name}
+                                            onChange={e => {
+                                                const list = [...medicationList];
+                                                list[index].name = e.target.value;
+                                                setMedicationList(list);
+                                            }}
+                                            required
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Dosage (e.g. 500mg)"
+                                            className="p-2 border border-slate-200 dark:border-slate-600 rounded-md text-sm dark:bg-slate-700 dark:text-slate-100"
+                                            value={med.dosage}
+                                            onChange={e => {
+                                                const list = [...medicationList];
+                                                list[index].dosage = e.target.value;
+                                                setMedicationList(list);
+                                            }}
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Frequency (e.g. 3x daily)"
+                                            className="p-2 border border-slate-200 dark:border-slate-600 rounded-md text-sm dark:bg-slate-700 dark:text-slate-100"
+                                            value={med.frequency}
+                                            onChange={e => {
+                                                const list = [...medicationList];
+                                                list[index].frequency = e.target.value;
+                                                setMedicationList(list);
+                                            }}
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Duration (e.g. 5 days)"
+                                            className="p-2 border border-slate-200 dark:border-slate-600 rounded-md text-sm dark:bg-slate-700 dark:text-slate-100"
+                                            value={med.duration}
+                                            onChange={e => {
+                                                const list = [...medicationList];
+                                                list[index].duration = e.target.value;
+                                                setMedicationList(list);
+                                            }}
+                                        />
+                                    </div>
+                                    {medicationList.length > 1 && (
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const list = [...medicationList];
+                                                list.splice(index, 1);
+                                                setMedicationList(list);
+                                            }}
+                                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+                            <button
+                                type="button"
+                                onClick={() => setMedicationList([...medicationList, { name: '', dosage: '', frequency: '', duration: '' }])}
+                                className="text-sm text-primary-600 font-medium hover:text-primary-700 flex items-center gap-1"
+                            >
+                                <Plus className="w-4 h-4" /> Add Another Medication
+                            </button>
+                        </div>
                         <textarea
-                            required
-                            placeholder="Medications (e.g., Paracetamol 500mg - 1 tablet 3x daily)"
-                            className="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-lg md:col-span-2 h-24 focus:ring-2 focus:ring-primary-400"
-                            value={formData.medications}
-                            onChange={e => setFormData({ ...formData, medications: e.target.value })}
-                        />
-                        <textarea
-                            placeholder="Instructions (e.g., Take after meals)"
-                            className="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-lg md:col-span-2 h-20 focus:ring-2 focus:ring-primary-400"
+                            placeholder="Instructions&#10;e.g., Drink plenty of water. Avoid spicy food."
+                            className="p-3 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-lg md:col-span-2 min-h-[100px] focus:ring-2 focus:ring-primary-400 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                             value={formData.instructions}
                             onChange={e => setFormData({ ...formData, instructions: e.target.value })}
                         />
@@ -155,7 +235,7 @@ export default function Prescriptions() {
                             onChange={e => setFormData({ ...formData, validDays: parseInt(e.target.value) })}
                         />
                         <div className="md:col-span-2 flex justify-end gap-3">
-                            <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 text-slate-600 bg-slate-100 dark:bg-slate-700 rounded-lg">Cancel</button>
+                            <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 text-red-600 bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 rounded-lg font-medium transition-colors">Cancel</button>
                             <button type="submit" className="px-4 py-2 bg-primary-600 text-white rounded-lg font-medium">Create Prescription</button>
                         </div>
                     </form>
@@ -198,10 +278,72 @@ export default function Prescriptions() {
                                 <div><span className="text-slate-500 dark:text-slate-400">Valid Until:</span><p>{selectedPrescription.validUntil ? new Date(selectedPrescription.validUntil).toLocaleDateString() : 'N/A'}</p></div>
                             </div>
                         </div>
-                        <button onClick={() => setSelectedPrescription(null)} className="w-full mt-6 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 rounded-lg font-medium">Close</button>
+                    </div>
+                    <div className="flex gap-3 mt-6 no-print">
+                        <button onClick={() => window.print()} className="flex-1 py-2 px-4 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 flex items-center justify-center gap-2 whitespace-nowrap">
+                            <Printer className="w-4 h-4" /> Print Prescription
+                        </button>
+                        <button onClick={() => setSelectedPrescription(null)} className="px-6 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg font-medium whitespace-nowrap">
+                            Close
+                        </button>
                     </div>
                 </div>
             )}
+
+            {/* Print Template (Hidden normally, visible only on print) */}
+            {
+                selectedPrescription && (
+                    <div className="hidden print:block fixed inset-0 bg-white z-[100] p-8">
+                        <div className="text-center border-b pb-6 mb-6">
+                            <h1 className="text-3xl font-bold text-slate-900">Smart Clinic</h1>
+                            <p className="text-slate-500 mt-1">Excellence in Healthcare Management</p>
+                        </div>
+
+                        <div className="flex justify-between mb-8">
+                            <div>
+                                <p className="text-xs text-slate-500 uppercase tracking-wide">Patient</p>
+                                <h3 className="text-xl font-bold text-slate-900">{selectedPrescription.patient?.name}</h3>
+                                <p className="text-sm text-slate-600">ID: #{selectedPrescription.patient?.id?.substring(0, 8)}</p>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-xs text-slate-500 uppercase tracking-wide">Prescribed By</p>
+                                <h3 className="text-xl font-bold text-slate-900">Dr. {selectedPrescription.doctor?.name}</h3>
+                                <p className="text-sm text-slate-600">Date: {new Date().toLocaleDateString()}</p>
+                            </div>
+                        </div>
+
+                        <div className="mb-6">
+                            <h4 className="font-bold text-slate-900 mb-2 border-b border-slate-200 pb-1">Diagnosis</h4>
+                            <p className="text-slate-800">{selectedPrescription.diagnosis}</p>
+                        </div>
+
+                        <div className="mb-6">
+                            <h4 className="font-bold text-slate-900 mb-2 border-b border-slate-200 pb-1">Medications</h4>
+                            <div className="whitespace-pre-wrap text-slate-800 font-mono text-sm leading-relaxed">
+                                {selectedPrescription.medications}
+                            </div>
+                        </div>
+
+                        {selectedPrescription.instructions && (
+                            <div className="mb-8">
+                                <h4 className="font-bold text-slate-900 mb-2 border-b border-slate-200 pb-1">Instructions</h4>
+                                <p className="text-slate-800">{selectedPrescription.instructions}</p>
+                            </div>
+                        )}
+
+                        <div className="border-t pt-8 mt-12 flex justify-between items-end">
+                            <div className="text-sm text-slate-500">
+                                <p>Valid Until: {selectedPrescription.validUntil ? new Date(selectedPrescription.validUntil).toLocaleDateString() : 'N/A'}</p>
+                                <p className="mt-1">Generated by Smart Clinic System</p>
+                            </div>
+                            <div className="text-center">
+                                <div className="h-16 w-32 border-b border-slate-300 mb-2"></div>
+                                <p className="text-sm font-medium text-slate-900">Doctor's Signature</p>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
 
             {/* Prescriptions Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -246,6 +388,6 @@ export default function Prescriptions() {
                     ))
                 )}
             </div>
-        </div>
+        </div >
     );
 }

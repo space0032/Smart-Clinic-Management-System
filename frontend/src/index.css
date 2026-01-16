@@ -39,3 +39,21 @@
 ::-webkit-scrollbar-thumb {
     @apply bg-slate-200 rounded-full hover:bg-slate-300 transition-colors;
 }
+
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    body {
+        background-color: white !important;
+        color: black !important;
+    }
+
+    /* Resume dark mode overrides if any */
+    .dark body {
+        background-color: white !important;
+        color: black !important;
+        
+    }
+}
