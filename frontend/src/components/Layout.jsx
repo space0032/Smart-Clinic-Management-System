@@ -38,6 +38,7 @@ const Layout = () => {
         '/billing': FileText,
         '/reports': BarChart3,
         '/lab': FlaskConical,
+        '/staff': Users,
         '/settings': Settings,
     };
 

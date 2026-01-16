@@ -77,7 +77,32 @@ export default function Laboratory() {
         }
     };
 
-    const StatusBadge = ({ status }) => {
+    const [showStatusModal, setShowStatusModal] = useState(false);
+    const [selectedOrder, setSelectedOrder] = useState(null);
+    const [newStatus, setNewStatus] = useState('');
+
+    const openStatusModal = (order) => {
+        setSelectedOrder(order);
+        setNewStatus(order.status);
+        setShowStatusModal(true);
+    };
+
+    const handleUpdateStatus = async () => {
+        if (!selectedOrder) return;
+        try {
+            await axios.put(`http://localhost:8080/api/lab/orders/${selectedOrder.id}/status`, newStatus, {
+                headers: { 'Content-Type': 'text/plain' }
+            });
+            toast.show('Status updated successfully', 'success');
+            setShowStatusModal(false);
+            fetchData();
+        } catch (error) {
+            console.error('Update Status Error:', error);
+            toast.show('Failed to update status', 'error');
+        }
+    };
+
+    const StatusBadge = ({ status, onClick }) => {
         const colors = {
             'PENDING': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
             'IN_PROGRESS': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
@@ -85,9 +110,13 @@ export default function Laboratory() {
             'CANCELLED': 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
         };
         return (
-            <span className={`px-2 py-1 rounded-full text-xs font-medium ${colors[status] || 'bg-gray-100 text-gray-800'}`}>
+            <button
+                onClick={onClick}
+                className={`px-3 py-1 rounded-full text-xs font-medium border border-transparent hover:border-current transition-all ${colors[status] || 'bg-gray-100 text-gray-800'}`}
+                title="Click to update status"
+            >
                 {status}
-            </span>
+            </button>
         );
     };
 
@@ -163,7 +192,7 @@ export default function Laboratory() {
                                                 {new Date(order.orderDate).toLocaleDateString()}
                                             </td>
                                             <td className="px-6 py-4">
-                                                <StatusBadge status={order.status} />
+                                                <StatusBadge status={order.status} onClick={() => openStatusModal(order)} />
                                             </td>
                                             <td className="px-6 py-4">
                                                 <button className="text-primary-600 hover:text-primary-700 text-sm font-medium">
@@ -294,6 +323,43 @@ export default function Laboratory() {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+            {/* Update Status Modal */}
+            {showStatusModal && selectedOrder && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-sm p-6">
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-4">Update Status</h2>
+                        <div className="mb-6">
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                Status
+                            </label>
+                            <select
+                                className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                value={newStatus}
+                                onChange={(e) => setNewStatus(e.target.value)}
+                            >
+                                <option value="PENDING">PENDING</option>
+                                <option value="IN_PROGRESS">IN_PROGRESS</option>
+                                <option value="COMPLETED">COMPLETED</option>
+                                <option value="CANCELLED">CANCELLED</option>
+                            </select>
+                        </div>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setShowStatusModal(false)}
+                                className="flex-1 px-4 py-2 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleUpdateStatus}
+                                className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors font-medium shadow-lg shadow-primary-600/20"
+                            >
+                                Update
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

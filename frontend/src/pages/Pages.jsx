@@ -13,3 +13,4 @@ export { default as Settings } from './Settings';
 export { default as Prescriptions } from './Prescriptions';
 export { default as PatientDashboard } from './PatientDashboard';
 export { default as Laboratory } from './Laboratory';
+export { default as Staff } from './Staff';

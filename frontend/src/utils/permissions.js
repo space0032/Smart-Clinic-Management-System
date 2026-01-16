@@ -2,7 +2,9 @@
 export const ROLES = {
     ADMIN: 'ADMIN',
     DOCTOR: 'DOCTOR',
-    RECEPTIONIST: 'RECEPTIONIST'
+    DOCTOR: 'DOCTOR',
+    RECEPTIONIST: 'RECEPTIONIST',
+    NURSE: 'NURSE'
 };
 
 // Define which routes each role can access
@@ -16,6 +18,9 @@ export const PERMISSIONS = {
     ],
     [ROLES.RECEPTIONIST]: [
         '/', '/patients', '/appointments', '/billing', '/settings', '/search', '/lab'
+    ],
+    [ROLES.NURSE]: [
+        '/', '/patients', '/appointments', '/medical-records', '/lab', '/settings', '/search'
     ]
 };
 
@@ -29,8 +34,9 @@ export const NAV_ITEMS = [
     { name: 'Prescriptions', href: '/prescriptions', roles: ['ADMIN', 'DOCTOR'] },
     { name: 'Billing', href: '/billing', roles: ['ADMIN', 'RECEPTIONIST'] },
     { name: 'Reports', href: '/reports', roles: ['ADMIN'] },
-    { name: 'Laboratory', href: '/lab', roles: ['ADMIN', 'DOCTOR', 'RECEPTIONIST'] },
-    { name: 'Settings', href: '/settings', roles: ['ADMIN', 'DOCTOR', 'RECEPTIONIST'] },
+    { name: 'Laboratory', href: '/lab', roles: ['ADMIN', 'DOCTOR', 'RECEPTIONIST', 'NURSE'] },
+    { name: 'Staff', href: '/staff', roles: ['ADMIN'] },
+    { name: 'Settings', href: '/settings', roles: ['ADMIN', 'DOCTOR', 'RECEPTIONIST', 'NURSE'] },
 ];
 
 // Check if user has permission to access a route
