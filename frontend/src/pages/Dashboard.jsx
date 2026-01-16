@@ -14,6 +14,9 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [recentAppointments, setRecentAppointments] = useState([]);
 
+    // Get logged in user
+    const user = JSON.parse(localStorage.getItem('clinicUser') || '{}');
+
     useEffect(() => {
         fetchDashboardData();
     }, []);
@@ -73,6 +76,22 @@ export default function Dashboard() {
 
     return (
         <div className="space-y-8">
+            {/* Role-Based Welcome Header */}
+            <div className="bg-gradient-to-r from-primary-600 to-secondary-600 rounded-2xl p-6 text-white">
+                <h1 className="text-2xl font-bold">
+                    Welcome back, {user.name || 'User'}! 👋
+                </h1>
+                <p className="text-white/80 mt-1">
+                    {user.role === 'ADMIN' && 'You have full access to manage the clinic system.'}
+                    {user.role === 'DOCTOR' && 'View your scheduled appointments and patient records.'}
+                    {user.role === 'RECEPTIONIST' && 'Manage appointments, patients, and billing.'}
+                    {!user.role && 'Here\'s an overview of today\'s clinic operations.'}
+                </p>
+                <span className="inline-block mt-3 px-3 py-1 bg-white/20 rounded-full text-xs font-medium">
+                    {user.role || 'STAFF'}
+                </span>
+            </div>
+
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {statCards.map((stat, index) => {
@@ -130,9 +149,9 @@ export default function Dashboard() {
                                             </td>
                                             <td className="py-3">
                                                 <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${appt.status === 'COMPLETED' ? 'bg-green-50 text-green-700' :
-                                                        appt.status === 'CONFIRMED' ? 'bg-blue-50 text-blue-700' :
-                                                            appt.status === 'CANCELLED' ? 'bg-red-50 text-red-700' :
-                                                                'bg-yellow-50 text-yellow-700'
+                                                    appt.status === 'CONFIRMED' ? 'bg-blue-50 text-blue-700' :
+                                                        appt.status === 'CANCELLED' ? 'bg-red-50 text-red-700' :
+                                                            'bg-yellow-50 text-yellow-700'
                                                     }`}>
                                                     {appt.status}
                                                 </span>

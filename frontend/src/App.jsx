@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
-import { Dashboard, Patients, Doctors, Appointments, MedicalRecords, Billing, SearchPage, Login } from './pages/Pages';
+import { Dashboard, Patients, Doctors, Appointments, MedicalRecords, Billing, SearchPage, Login, Reports } from './pages/Pages';
 
 import PrivateRoute from './components/PrivateRoute';
 
@@ -20,6 +20,7 @@ const App = () => {
             <Route path="appointments" element={<Appointments />} />
             <Route path="medical-records" element={<MedicalRecords />} />
             <Route path="billing" element={<Billing />} />
+            <Route path="reports" element={<Reports />} />
           </Route>
         </Route>
       </Routes>

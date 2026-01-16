@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard, Users, Calendar, FileText, Settings, LogOut, Search,
-    Stethoscope, Activity, Menu, X
+    Stethoscope, Activity, Menu, X, BarChart3
 } from 'lucide-react';
 
 const Layout = () => {
@@ -25,6 +25,7 @@ const Layout = () => {
         { name: 'Appointments', href: '/appointments', icon: Calendar },
         { name: 'Records', href: '/medical-records', icon: Activity },
         { name: 'Billing', href: '/billing', icon: FileText },
+        { name: 'Reports', href: '/reports', icon: BarChart3 },
         { name: 'Settings', href: '/settings', icon: Settings },
     ];
 
