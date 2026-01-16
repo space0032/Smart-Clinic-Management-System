@@ -1,20 +1,13 @@
 package com.clinic.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.Objects;
 
 @Entity
 @Table(name = "bills")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class Bill {
 
     @Id
@@ -43,5 +36,99 @@ public class Bill {
 
     public enum BillStatus {
         PENDING, PAID, OVERDUE
+    }
+
+    public Bill() {
+    }
+
+    public Bill(UUID id, Appointment appointment, Patient patient, BigDecimal amount, BillStatus status,
+            LocalDateTime paymentDate, String paymentMethod) {
+        this.id = id;
+        this.appointment = appointment;
+        this.patient = patient;
+        this.amount = amount;
+        this.status = status;
+        this.paymentDate = paymentDate;
+        this.paymentMethod = paymentMethod;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public Appointment getAppointment() {
+        return appointment;
+    }
+
+    public void setAppointment(Appointment appointment) {
+        this.appointment = appointment;
+    }
+
+    public Patient getPatient() {
+        return patient;
+    }
+
+    public void setPatient(Patient patient) {
+        this.patient = patient;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public BillStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(BillStatus status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getPaymentDate() {
+        return paymentDate;
+    }
+
+    public void setPaymentDate(LocalDateTime paymentDate) {
+        this.paymentDate = paymentDate;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Bill bill = (Bill) o;
+        return Objects.equals(id, bill.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Bill{" +
+                "id=" + id +
+                ", amount=" + amount +
+                ", status=" + status +
+                '}';
     }
 }

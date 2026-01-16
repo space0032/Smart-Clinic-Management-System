@@ -1,18 +1,11 @@
 package com.clinic.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import java.util.UUID;
+import java.util.Objects;
 
 @Entity
 @Table(name = "doctors")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class Doctor {
 
     @Id
@@ -37,8 +30,109 @@ public class Doctor {
     @Column(name = "contact_no")
     private String contactNo;
 
-    // Simplified availability as a String (JSON) for now,
-    // real implementation might use a separate table or custom type
     @Column(name = "availability_schedule", columnDefinition = "TEXT")
     private String availabilitySchedule;
+
+    public Doctor() {
+    }
+
+    public Doctor(UUID id, UUID userId, String name, String email, String specialization, Integer experienceYears,
+            String contactNo, String availabilitySchedule) {
+        this.id = id;
+        this.userId = userId;
+        this.name = name;
+        this.email = email;
+        this.specialization = specialization;
+        this.experienceYears = experienceYears;
+        this.contactNo = contactNo;
+        this.availabilitySchedule = availabilitySchedule;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public UUID getUserId() {
+        return userId;
+    }
+
+    public void setUserId(UUID userId) {
+        this.userId = userId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getSpecialization() {
+        return specialization;
+    }
+
+    public void setSpecialization(String specialization) {
+        this.specialization = specialization;
+    }
+
+    public Integer getExperienceYears() {
+        return experienceYears;
+    }
+
+    public void setExperienceYears(Integer experienceYears) {
+        this.experienceYears = experienceYears;
+    }
+
+    public String getContactNo() {
+        return contactNo;
+    }
+
+    public void setContactNo(String contactNo) {
+        this.contactNo = contactNo;
+    }
+
+    public String getAvailabilitySchedule() {
+        return availabilitySchedule;
+    }
+
+    public void setAvailabilitySchedule(String availabilitySchedule) {
+        this.availabilitySchedule = availabilitySchedule;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Doctor doctor = (Doctor) o;
+        return Objects.equals(id, doctor.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Doctor{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", specialization='" + specialization + '\'' +
+                '}';
+    }
 }
