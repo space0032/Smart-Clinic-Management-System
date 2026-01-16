@@ -165,28 +165,28 @@ export default function Dashboard() {
                 </div>
 
                 {/* Quick Actions & Stats */}
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col">
-                    <h3 className="text-lg font-bold text-slate-800 mb-6">Quick Actions</h3>
+                <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-6 flex flex-col">
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-6">Quick Actions</h3>
                     <div className="space-y-3 flex-1">
-                        <a href="/patients" className="w-full py-3 px-4 bg-primary-50 text-primary-700 font-medium rounded-xl hover:bg-primary-100 transition-colors flex items-center justify-center">
+                        <a href="/patients" className="w-full py-3 px-4 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 font-medium rounded-xl hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-colors flex items-center justify-center">
                             <Users className="w-5 h-5 mr-2" /> Register New Patient
                         </a>
-                        <a href="/appointments" className="w-full py-3 px-4 bg-secondary-50 text-secondary-700 font-medium rounded-xl hover:bg-secondary-100 transition-colors flex items-center justify-center">
+                        <a href="/appointments" className="w-full py-3 px-4 bg-secondary-50 dark:bg-indigo-900/30 text-secondary-700 dark:text-indigo-300 font-medium rounded-xl hover:bg-secondary-100 dark:hover:bg-indigo-900/50 transition-colors flex items-center justify-center">
                             <Calendar className="w-5 h-5 mr-2" /> Book Appointment
                         </a>
-                        <a href="/billing" className="w-full py-3 px-4 bg-slate-50 text-slate-700 font-medium rounded-xl hover:bg-slate-100 transition-colors flex items-center justify-center">
+                        <a href="/billing" className="w-full py-3 px-4 bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-medium rounded-xl hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors flex items-center justify-center">
                             <DollarSign className="w-5 h-5 mr-2" /> Generate Invoice
                         </a>
                     </div>
 
-                    <div className="mt-8 pt-6 border-t border-slate-100">
+                    <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-700">
                         <div className="flex items-center justify-between text-sm mb-3">
-                            <span className="text-slate-500">Pending Bills</span>
-                            <span className="font-bold text-orange-600">${Number(stats.pendingBills).toLocaleString()}</span>
+                            <span className="text-slate-500 dark:text-slate-400">Pending Bills</span>
+                            <span className="font-bold text-orange-600 dark:text-orange-400">${Number(stats.pendingBills).toLocaleString()}</span>
                         </div>
                         <div className="flex items-center justify-between text-sm">
-                            <span className="text-slate-500">System Status</span>
-                            <span className="flex items-center text-green-600 font-medium">
+                            <span className="text-slate-500 dark:text-slate-400">System Status</span>
+                            <span className="flex items-center text-green-600 dark:text-green-400 font-medium">
                                 <span className="w-2 h-2 rounded-full bg-green-500 mr-2"></span>
                                 Online
                             </span>

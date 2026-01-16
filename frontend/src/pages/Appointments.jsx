@@ -171,7 +171,7 @@ export default function Appointments() {
             {/* Appointment Cards */}
             <div className="space-y-4">
                 {loading ? (
-                    <div className="text-gray-500 text-center py-8">Loading appointments...</div>
+                    <div className="text-gray-500 dark:text-slate-400 text-center py-8">Loading appointments...</div>
                 ) : appointments.length === 0 ? (
                     <div className="text-gray-500 dark:text-slate-400 text-center py-8 bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700">
                         <CalendarIcon className="w-12 h-12 mx-auto text-gray-200 mb-3" />
@@ -181,17 +181,17 @@ export default function Appointments() {
                     appointments.map((appt) => (
                         <div key={appt.id} className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                             <div className="flex items-start space-x-4">
-                                <div className="bg-indigo-50 p-3 rounded-lg text-center min-w-[80px]">
-                                    <span className="block text-sm font-semibold text-indigo-600">
+                                <div className="bg-indigo-50 dark:bg-indigo-900/20 p-3 rounded-lg text-center min-w-[80px]">
+                                    <span className="block text-sm font-semibold text-indigo-600 dark:text-indigo-400">
                                         {new Date(appt.appointmentDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                                     </span>
-                                    <span className="block text-xl font-bold text-indigo-800">
+                                    <span className="block text-xl font-bold text-indigo-800 dark:text-indigo-200">
                                         {new Date(appt.appointmentDate).getHours()}:{String(new Date(appt.appointmentDate).getMinutes()).padStart(2, '0')}
                                     </span>
                                 </div>
                                 <div>
                                     <div className="flex items-center gap-2">
-                                        <h3 className="text-lg font-semibold text-gray-900">{appt.patient?.name || 'Unknown Patient'}</h3>
+                                        <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{appt.patient?.name || 'Unknown Patient'}</h3>
                                         <span className={`px-2 py-0.5 rounded-full text-xs font-medium uppercase ${statusColors[appt.status] || 'bg-gray-100'}`}>
                                             {appt.status}
                                         </span>

@@ -182,17 +182,17 @@ export default function Billing() {
                             <tr><td colSpan="6" className="text-center py-4 text-gray-500 dark:text-slate-400">No invoices found.</td></tr>
                         ) : (
                             bills.map(bill => (
-                                <tr key={bill.id} className="hover:bg-gray-50">
+                                <tr key={bill.id} className="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
                                     <td className="px-6 py-4 font-mono text-xs text-gray-500 dark:text-slate-400">#{bill.id.substring(0, 8)}</td>
-                                    <td className="px-6 py-4 font-medium text-gray-900">{bill.patient?.name || 'N/A'}</td>
-                                    <td className="px-6 py-4 text-gray-600">
+                                    <td className="px-6 py-4 font-medium text-gray-900 dark:text-slate-100">{bill.patient?.name || 'N/A'}</td>
+                                    <td className="px-6 py-4 text-gray-600 dark:text-slate-300">
                                         {bill.paymentDate
                                             ? new Date(bill.paymentDate).toLocaleDateString()
                                             : bill.appointment?.appointmentDate
                                                 ? new Date(bill.appointment.appointmentDate).toLocaleDateString()
                                                 : 'Pending'}
                                     </td>
-                                    <td className="px-6 py-4 font-bold text-gray-900">${bill.amount.toFixed(2)}</td>
+                                    <td className="px-6 py-4 font-bold text-gray-900 dark:text-slate-100">${bill.amount.toFixed(2)}</td>
                                     <td className="px-6 py-4">
                                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${bill.status === 'PAID' ? 'bg-green-100 text-green-700' :
                                             bill.status === 'OVERDUE' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
@@ -204,12 +204,12 @@ export default function Billing() {
                                         {bill.status !== 'PAID' && (
                                             <button
                                                 onClick={() => handlePayment(bill.id)}
-                                                className="text-xs bg-indigo-50 text-indigo-700 px-3 py-1 rounded hover:bg-indigo-100 transition-colors"
+                                                className="text-xs bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 px-3 py-1 rounded hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
                                             >
                                                 Mark Paid
                                             </button>
                                         )}
-                                        {bill.status === 'PAID' && <span className="text-xs text-green-600 flex items-center"><CheckCircle className="w-3 h-3 mr-1" /> Paid</span>}
+                                        {bill.status === 'PAID' && <span className="text-xs text-green-600 dark:text-green-400 flex items-center"><CheckCircle className="w-3 h-3 mr-1" /> Paid</span>}
                                     </td>
                                 </tr>
                             ))

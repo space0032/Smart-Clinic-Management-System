@@ -130,7 +130,7 @@ export default function Doctors() {
                         <div className="md:col-span-2 flex justify-end gap-3 mt-2">
                             <button
                                 type="button" onClick={() => setShowForm(false)}
-                                className="px-4 py-2 text-slate-600 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200"
+                                className="px-4 py-2 text-slate-600 dark:text-slate-200 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600"
                             >
                                 Cancel
                             </button>
@@ -148,9 +148,9 @@ export default function Doctors() {
             {/* Grid View for Doctors */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {loading ? (
-                    <div className="text-slate-500 col-span-3 text-center">Loading doctors...</div>
+                    <div className="text-slate-500 dark:text-slate-400 col-span-3 text-center">Loading doctors...</div>
                 ) : filteredDoctors.length === 0 ? (
-                    <div className="text-slate-500 col-span-3 text-center">No doctors found.</div>
+                    <div className="text-slate-500 dark:text-slate-400 col-span-3 text-center">No doctors found.</div>
                 ) : (
                     filteredDoctors.map((doc) => (
                         <div key={doc.id} className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col items-center text-center hover:shadow-md transition-shadow group">

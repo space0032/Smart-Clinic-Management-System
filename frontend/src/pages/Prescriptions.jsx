@@ -176,26 +176,26 @@ export default function Prescriptions() {
                                     <p className="text-sm text-slate-500 dark:text-slate-500">#{selectedPrescription.id?.substring(0, 8)}</p>
                                 </div>
                             </div>
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${selectedPrescription.status === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${selectedPrescription.status === 'ACTIVE' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                                 }`}>
                                 {selectedPrescription.status}
                             </span>
                         </div>
                         <div className="space-y-4">
                             <div className="grid grid-cols-2 gap-4 text-sm">
-                                <div><span className="text-slate-500 dark:text-slate-500">Patient:</span><p className="font-medium">{selectedPrescription.patient?.name}</p></div>
-                                <div><span className="text-slate-500 dark:text-slate-500">Doctor:</span><p className="font-medium">Dr. {selectedPrescription.doctor?.name}</p></div>
+                                <div><span className="text-slate-500 dark:text-slate-400">Patient:</span><p className="font-medium">{selectedPrescription.patient?.name}</p></div>
+                                <div><span className="text-slate-500 dark:text-slate-400">Doctor:</span><p className="font-medium">Dr. {selectedPrescription.doctor?.name}</p></div>
                             </div>
                             {selectedPrescription.diagnosis && (
-                                <div><span className="text-sm text-slate-500 dark:text-slate-500">Diagnosis:</span><p className="mt-1 text-slate-800 dark:text-slate-100">{selectedPrescription.diagnosis}</p></div>
+                                <div><span className="text-sm text-slate-500 dark:text-slate-400">Diagnosis:</span><p className="mt-1 text-slate-800 dark:text-slate-100">{selectedPrescription.diagnosis}</p></div>
                             )}
-                            <div><span className="text-sm text-slate-500 dark:text-slate-500">Medications:</span><pre className="mt-1 text-slate-800 whitespace-pre-wrap bg-slate-50 dark:bg-slate-700 p-3 rounded-lg text-sm">{selectedPrescription.medications}</pre></div>
+                            <div><span className="text-sm text-slate-500 dark:text-slate-400">Medications:</span><pre className="mt-1 text-slate-800 dark:text-slate-100 whitespace-pre-wrap bg-slate-50 dark:bg-slate-700 p-3 rounded-lg text-sm">{selectedPrescription.medications}</pre></div>
                             {selectedPrescription.instructions && (
-                                <div><span className="text-sm text-slate-500 dark:text-slate-500">Instructions:</span><p className="mt-1 text-slate-800 bg-yellow-50 p-3 rounded-lg text-sm">{selectedPrescription.instructions}</p></div>
+                                <div><span className="text-sm text-slate-500 dark:text-slate-400">Instructions:</span><p className="mt-1 text-slate-800 dark:text-slate-100 bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg text-sm">{selectedPrescription.instructions}</p></div>
                             )}
-                            <div className="grid grid-cols-2 gap-4 text-sm pt-4 border-t">
-                                <div><span className="text-slate-500 dark:text-slate-500">Prescribed:</span><p>{selectedPrescription.prescribedDate ? new Date(selectedPrescription.prescribedDate).toLocaleDateString() : 'N/A'}</p></div>
-                                <div><span className="text-slate-500 dark:text-slate-500">Valid Until:</span><p>{selectedPrescription.validUntil ? new Date(selectedPrescription.validUntil).toLocaleDateString() : 'N/A'}</p></div>
+                            <div className="grid grid-cols-2 gap-4 text-sm pt-4 border-t border-slate-200 dark:border-slate-700">
+                                <div><span className="text-slate-500 dark:text-slate-400">Prescribed:</span><p>{selectedPrescription.prescribedDate ? new Date(selectedPrescription.prescribedDate).toLocaleDateString() : 'N/A'}</p></div>
+                                <div><span className="text-slate-500 dark:text-slate-400">Valid Until:</span><p>{selectedPrescription.validUntil ? new Date(selectedPrescription.validUntil).toLocaleDateString() : 'N/A'}</p></div>
                             </div>
                         </div>
                         <button onClick={() => setSelectedPrescription(null)} className="w-full mt-6 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 rounded-lg font-medium">Close</button>
@@ -222,13 +222,13 @@ export default function Prescriptions() {
                                         <p className="text-xs text-slate-500 dark:text-slate-500">Dr. {prescription.doctor?.name}</p>
                                     </div>
                                 </div>
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${prescription.status === 'ACTIVE' ? 'bg-green-100 text-green-700' :
-                                        prescription.status === 'EXPIRED' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${prescription.status === 'ACTIVE' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' :
+                                    prescription.status === 'EXPIRED' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                                     }`}>
                                     {prescription.status}
                                 </span>
                             </div>
-                            <p className="text-sm text-slate-600 line-clamp-2 mb-3">{prescription.medications}</p>
+                            <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2 mb-3">{prescription.medications}</p>
                             <div className="flex justify-between items-center pt-3 border-t border-slate-100">
                                 <span className="text-xs text-slate-400 dark:text-slate-500">
                                     {prescription.prescribedDate ? new Date(prescription.prescribedDate).toLocaleDateString() : ''}
