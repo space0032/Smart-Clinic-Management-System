@@ -34,12 +34,14 @@ public class DoctorController {
     }
 
     @PostMapping
+    @SuppressWarnings("null")
     public Doctor createDoctor(@RequestBody @jakarta.validation.Valid Doctor doctor) {
         return Optional.ofNullable(doctorRepository.save(doctor))
                 .orElseThrow(() -> new RuntimeException("Failed to save doctor"));
     }
 
     @PutMapping("/{id}")
+    @SuppressWarnings("null")
     public ResponseEntity<Doctor> updateDoctor(@PathVariable @NonNull UUID id,
             @RequestBody @jakarta.validation.Valid Doctor doctorDetails) {
         return doctorRepository.findById(id)

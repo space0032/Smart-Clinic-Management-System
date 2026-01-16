@@ -81,6 +81,7 @@ public class PrescriptionController {
     }
 
     @PutMapping("/{id}")
+    @SuppressWarnings("null")
     public ResponseEntity<Prescription> updatePrescription(@PathVariable @NonNull UUID id,
             @RequestBody PrescriptionRequest request) {
         return prescriptionRepository.findById(id)

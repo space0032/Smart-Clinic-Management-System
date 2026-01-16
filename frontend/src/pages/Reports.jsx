@@ -4,12 +4,10 @@ import {
     TrendingUp, Users, Calendar, DollarSign,
     BarChart3, PieChart, Activity, Download
 } from 'lucide-react';
-import { useToast } from '../components/Toast';
 
 export default function Reports() {
     const [analytics, setAnalytics] = useState(null);
     const [loading, setLoading] = useState(true);
-    const toast = useToast();
 
     useEffect(() => {
         fetchAnalytics();
@@ -21,7 +19,6 @@ export default function Reports() {
             setAnalytics(response.data);
         } catch (error) {
             console.error('Error fetching analytics:', error);
-            toast.error("Failed to load analytics data");
         } finally {
             setLoading(false);
         }
@@ -29,7 +26,6 @@ export default function Reports() {
 
     const handleExportPdf = async () => {
         try {
-            toast.info("Generating PDF report...");
             const response = await axios.get('http://localhost:8080/api/reports/export/pdf', {
                 responseType: 'blob',
             });
@@ -40,16 +36,13 @@ export default function Reports() {
             document.body.appendChild(link);
             link.click();
             link.remove();
-            toast.success("PDF exported successfully");
         } catch (error) {
             console.error('Error exporting PDF:', error);
-            toast.error("Failed to export PDF report");
         }
     };
 
     const handleExportExcel = async () => {
         try {
-            toast.info("Generating Excel report...");
             const response = await axios.get('http://localhost:8080/api/reports/export/excel', {
                 responseType: 'blob',
             });
@@ -60,10 +53,8 @@ export default function Reports() {
             document.body.appendChild(link);
             link.click();
             link.remove();
-            toast.success("Excel exported successfully");
         } catch (error) {
             console.error('Error exporting Excel:', error);
-            toast.error("Failed to export Excel report");
         }
     };
 

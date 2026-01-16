@@ -6,10 +6,7 @@ import java.util.UUID;
 import java.util.Objects;
 
 @Entity
-@Table(name = "appointments", indexes = {
-        @Index(name = "idx_appointment_date", columnList = "appointmentDate"),
-        @Index(name = "idx_appointment_status", columnList = "status")
-})
+@Table(name = "appointments")
 public class Appointment {
 
     @Id

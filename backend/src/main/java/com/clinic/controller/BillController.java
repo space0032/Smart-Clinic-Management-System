@@ -71,6 +71,7 @@ public class BillController {
     }
 
     @PutMapping("/{id}")
+    @SuppressWarnings("null")
     public ResponseEntity<Bill> updateBill(@PathVariable @NonNull UUID id, @RequestBody BillRequest request) {
         return billRepository.findById(id)
                 .map(bill -> {

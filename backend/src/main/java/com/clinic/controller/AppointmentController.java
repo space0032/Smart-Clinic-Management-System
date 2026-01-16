@@ -10,13 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.lang.NonNull;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.Objects;
 import java.util.Optional;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.PageRequest;
 
 @RestController
 @RequestMapping("/api/appointments")
@@ -36,11 +33,8 @@ public class AppointmentController {
     }
 
     @GetMapping
-    public Page<Appointment> getAllAppointments(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return appointmentRepository.findAll(pageable);
+    public List<Appointment> getAllAppointments() {
+        return appointmentRepository.findAll();
     }
 
     @GetMapping("/{id}")
@@ -74,6 +68,7 @@ public class AppointmentController {
     }
 
     @PutMapping("/{id}")
+    @SuppressWarnings("null")
     public ResponseEntity<Appointment> updateAppointment(@PathVariable @NonNull UUID id,
             @RequestBody @jakarta.validation.Valid AppointmentRequest request) {
         return appointmentRepository.findById(id)

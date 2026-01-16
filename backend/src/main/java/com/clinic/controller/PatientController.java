@@ -8,12 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.lang.NonNull;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.Optional;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.PageRequest;
 
 @RestController
 @RequestMapping("/api/patients")
@@ -29,11 +26,8 @@ public class PatientController {
     }
 
     @GetMapping
-    public Page<Patient> getAllPatients(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return patientRepository.findAll(pageable);
+    public List<Patient> getAllPatients() {
+        return patientRepository.findAll();
     }
 
     @GetMapping("/{id}")
@@ -44,6 +38,7 @@ public class PatientController {
     }
 
     @PostMapping
+    @SuppressWarnings("null")
     public Patient createPatient(@RequestBody @jakarta.validation.Valid Patient patient) {
         Patient savedPatient = Optional.ofNullable(patientRepository.save(patient))
                 .orElseThrow(() -> new RuntimeException("Failed to save patient"));
@@ -67,6 +62,7 @@ public class PatientController {
     }
 
     @PutMapping("/{id}")
+    @SuppressWarnings("null")
     public ResponseEntity<Patient> updatePatient(@PathVariable @NonNull UUID id,
             @RequestBody @jakarta.validation.Valid Patient patientDetails) {
         return patientRepository.findById(id)
