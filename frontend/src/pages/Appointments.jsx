@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../utils/supabase';
+import axios from 'axios';
 import { Plus, Calendar as CalendarIcon, Clock, User, Stethoscope, CheckCircle, XCircle, LayoutGrid, List } from 'lucide-react';
 import CalendarView from '../components/CalendarView';
 
@@ -19,6 +19,10 @@ export default function Appointments() {
         notes: ''
     });
 
+    const API_URL = 'http://localhost:8080/api/appointments';
+    const DOCTORS_URL = 'http://localhost:8080/api/doctors';
+    const PATIENTS_URL = 'http://localhost:8080/api/patients';
+
     useEffect(() => {
         fetchData();
     }, []);
@@ -26,30 +30,19 @@ export default function Appointments() {
     const fetchData = async () => {
         try {
             const [apptRes, docRes, patRes] = await Promise.all([
-                supabase.from('appointments').select(`
-                    *,
-                    patient:patients(id, name, contactNo),
-                    doctor:doctors(id, name, specialization)
-                `).order('appointment_date', { ascending: false }),
-                supabase.from('doctors').select('*'),
-                supabase.from('patients').select('*')
+                axios.get(API_URL),
+                axios.get(DOCTORS_URL),
+                axios.get(PATIENTS_URL)
             ]);
-
-            if (apptRes.error) throw apptRes.error;
-            if (docRes.error) throw docRes.error;
-            if (patRes.error) throw patRes.error;
-
-            // Map snake_case to camelCase for consistency
-            const mappedAppointments = apptRes.data.map(appt => ({
-                ...appt,
-                appointmentDate: appt.appointment_date
-            }));
-
-            setAppointments(mappedAppointments);
-            setDoctors(docRes.data);
-            setPatients(patRes.data);
+            // Backend returns paginated data: { content: [], totalPages: 1, ... }
+            setAppointments(apptRes.data.content || apptRes.data || []);
+            setDoctors(docRes.data || []);
+            setPatients(patRes.data.content || patRes.data || []);
         } catch (error) {
             console.error("Error fetching data:", error);
+            setAppointments([]);
+            setDoctors([]);
+            setPatients([]);
         } finally {
             setLoading(false);
         }
@@ -58,18 +51,16 @@ export default function Appointments() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const { error } = await supabase
-                .from('appointments')
-                .insert([{
-                    patient_id: formData.patientId,
-                    doctor_id: formData.doctorId,
-                    appointment_date: formData.appointmentDate,
-                    notes: formData.notes,
-                    status: 'SCHEDULED'
-                }]);
+            // Format date for backend (LocalDateTime expects: "2024-01-17T14:30:00")
+            const payload = {
+                patientId: formData.patientId,
+                doctorId: formData.doctorId,
+                appointmentDate: formData.appointmentDate + ':00', // Add seconds if not present
+                notes: formData.notes,
+                status: 'SCHEDULED'
+            };
 
-            if (error) throw error;
-
+            await axios.post(API_URL, payload);
             setShowForm(false);
             setFormData({
                 patientId: '', doctorId: '', appointmentDate: '', notes: ''
@@ -77,7 +68,8 @@ export default function Appointments() {
             fetchData();
         } catch (error) {
             console.error("Error booking appointment:", error);
-            alert("Failed to book appointment. Ensure all fields are valid.");
+            const errorMsg = error.response?.data || 'Failed to book appointment. Ensure all fields are valid.';
+            alert(typeof errorMsg === 'string' ? errorMsg : 'Failed to book appointment.');
         }
     };
 
@@ -96,15 +88,25 @@ export default function Appointments() {
 
     const handleStatusUpdate = async (id, status) => {
         try {
-            const { error } = await supabase
-                .from('appointments')
-                .update({ status })
-                .eq('id', id);
+            // Find the appointment to get its full data
+            const appointment = appointments.find(a => a.id === id);
+            if (!appointment) return;
 
-            if (error) throw error;
+            // Backend requires full AppointmentRequest object with validation
+            const payload = {
+                patientId: appointment.patient.id,
+                doctorId: appointment.doctor.id,
+                appointmentDate: appointment.appointmentDate,
+                status: status,
+                reason: appointment.reason || '',
+                notes: appointment.notes || ''
+            };
+
+            await axios.put(`${API_URL}/${id}`, payload);
             fetchData();
         } catch (error) {
             console.error("Error updating status:", error);
+            alert('Failed to update appointment status');
         }
     };
 

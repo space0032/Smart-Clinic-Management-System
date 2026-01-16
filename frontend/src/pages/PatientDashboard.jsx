@@ -44,15 +44,18 @@ export default function PatientDashboard() {
             ]);
 
             // Client-side filtering for MVP (In real app, API should filter by logged-in patient)
-            // Assuming Patient Name matches User Name for this simple integration
-            const myAppointments = apptRes.data.filter(appt =>
+            // Handle paginated response
+            const allAppointments = apptRes.data.content || apptRes.data || [];
+            const myAppointments = allAppointments.filter(appt =>
                 appt.patient && appt.patient.name === currentUser.name
             );
 
             setAppointments(myAppointments);
-            setDoctors(docRes.data);
+            setDoctors(docRes.data || []);
         } catch (error) {
             console.error("Error fetching data:", error);
+            setAppointments([]);
+            setDoctors([]);
         } finally {
             setLoading(false);
         }
@@ -70,7 +73,9 @@ export default function PatientDashboard() {
             // This is a bit tricky without a direct link in the frontend user object.
             // Option: Fetch all patients and find one with matching email/name.
             const patientsRes = await axios.get('http://localhost:8080/api/patients');
-            const myPatientProfile = patientsRes.data.find(p => p.email === user.email || p.name === user.name);
+            // Handle paginated response
+            const allPatients = patientsRes.data.content || patientsRes.data || [];
+            const myPatientProfile = allPatients.find(p => p.email === user.email || p.name === user.name);
 
             if (!myPatientProfile) {
                 alert("Could not find your patient profile. Please contact the clinic.");

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../utils/supabase';
+import axios from 'axios';
 import { Plus, Search, Trash2, Edit2 } from 'lucide-react';
 
 export default function Patients() {
@@ -20,7 +20,7 @@ export default function Patients() {
     });
 
     // Base API URL
-    // Base API URL removed in favor of Supabase
+    const API_URL = 'http://localhost:8080/api/patients';
 
     useEffect(() => {
         fetchPatients();
@@ -28,15 +28,12 @@ export default function Patients() {
 
     const fetchPatients = async () => {
         try {
-            const { data, error } = await supabase
-                .from('patients')
-                .select('*')
-                .order('name');
-
-            if (error) throw error;
-            setPatients(data);
+            const response = await axios.get(API_URL);
+            // Backend returns paginated data: { content: [], totalPages: 1, ... }
+            setPatients(response.data.content || response.data || []);
         } catch (error) {
             console.error("Error fetching patients:", error);
+            setPatients([]);
         } finally {
             setLoading(false);
         }
@@ -45,12 +42,7 @@ export default function Patients() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const { error } = await supabase
-                .from('patients')
-                .insert([formData]);
-
-            if (error) throw error;
-
+            await axios.post(API_URL, formData);
             setShowForm(false);
             setFormData({
                 name: '', email: '', contactNo: '', dateOfBirth: '',
@@ -66,12 +58,7 @@ export default function Patients() {
     const handleDelete = async (id) => {
         if (!confirm("Are you sure?")) return;
         try {
-            const { error } = await supabase
-                .from('patients')
-                .delete()
-                .eq('id', id);
-
-            if (error) throw error;
+            await axios.delete(`${API_URL}/${id}`);
             fetchPatients();
         } catch (error) {
             console.error("Error deleting patient:", error);

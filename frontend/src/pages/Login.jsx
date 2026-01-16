@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Activity, Mail, Lock, ArrowRight, Heart, Shield, Clock, User } from 'lucide-react';
-import { supabase } from '../utils/supabase';
+import axios from 'axios';
 
 export default function Login() {
     const [isRegister, setIsRegister] = useState(false);
@@ -21,56 +21,22 @@ export default function Login() {
         setMessage('');
 
         try {
-            let data, error;
-            if (isRegister) {
-                // Register
-                const res = await supabase.auth.signUp({
-                    email: formData.email,
-                    password: formData.password,
-                    options: {
-                        data: {
-                            name: formData.name,
-                            role: formData.role
-                        }
-                    }
-                });
-                data = res.data;
-                error = res.error;
-            } else {
-                // Login
-                const res = await supabase.auth.signInWithPassword({
-                    email: formData.email,
-                    password: formData.password
-                });
-                data = res.data;
-                error = res.error;
-            }
+            const endpoint = isRegister ? '/api/auth/register' : '/api/auth/login';
+            const response = await axios.post(`http://localhost:8080${endpoint}`, formData);
 
-            if (error) throw error;
-
-            if (data?.user) {
-                // Fetch user role from public.users table (trigger should have created it, or we fetch from metadata)
-                // For simplicity, we'll rely on the metadata we just set or fetched
-                const userRole = data.user.user_metadata?.role || 'RECEPTIONIST';
-                const userName = data.user.user_metadata?.name || formData.name;
-
-                const userSession = {
-                    ...data.user,
-                    role: userRole,
-                    name: userName
-                };
-
-                localStorage.setItem('clinicUser', JSON.stringify(userSession));
-
-                if (userRole === 'PATIENT') {
+            if (response.data.success) {
+                localStorage.setItem('clinicUser', JSON.stringify(response.data.user));
+                if (response.data.user.role === 'PATIENT') {
                     navigate('/patient-portal');
                 } else {
                     navigate('/');
                 }
+            } else {
+                setMessage('Error: ' + response.data.message);
             }
         } catch (error) {
-            console.error('Auth error:', error);
-            setMessage('Error: ' + (error.message || 'Authentication failed'));
+            const errorMsg = error.response?.data?.message || 'Authentication failed';
+            setMessage('Error: ' + errorMsg);
         }
         setLoading(false);
     };

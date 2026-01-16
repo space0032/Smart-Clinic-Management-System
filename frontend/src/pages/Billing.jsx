@@ -27,11 +27,13 @@ export default function Billing() {
                 axios.get(API_URL),
                 axios.get(APPOINTMENTS_URL)
             ]);
-            setBills(billsRes.data);
-            // Only show completed appointments that don't have bills yet (logic simplified for now)
-            setAppointments(apptsRes.data);
+            setBills(billsRes.data || []);
+            // Handle paginated appointments response
+            setAppointments(apptsRes.data.content || apptsRes.data || []);
         } catch (error) {
             console.error("Error fetching billing data:", error);
+            setBills([]);
+            setAppointments([]);
         } finally {
             setLoading(false);
         }
@@ -64,10 +66,15 @@ export default function Billing() {
         if (!method) return;
 
         try {
-            await axios.put(`${API_URL}/${id}/pay?method=${method}`);
+            // Backend expects BillRequest object with status enum
+            await axios.put(`${API_URL}/${id}`, {
+                status: 'PAID'  // Backend will auto-set paymentDate when status changes to PAID
+            });
             fetchData();
+            alert(`Payment recorded successfully via ${method}`);
         } catch (error) {
             console.error("Error processing payment:", error);
+            alert('Failed to mark bill as paid');
         }
     };
 

@@ -37,10 +37,14 @@ export default function Prescriptions() {
                 axios.get('http://localhost:8080/api/doctors')
             ]);
             setPrescriptions(prescRes.data);
-            setPatients(patientsRes.data);
-            setDoctors(doctorsRes.data);
+            // Handle paginated response
+            setPatients(patientsRes.data.content || patientsRes.data || []);
+            setDoctors(doctorsRes.data || []);
         } catch (error) {
             console.error('Error fetching data:', error);
+            setPrescriptions([]);
+            setPatients([]);
+            setDoctors([]);
         } finally {
             setLoading(false);
         }

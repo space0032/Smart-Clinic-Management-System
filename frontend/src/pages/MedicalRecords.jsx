@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../utils/supabase';
+import axios from 'axios';
 import { Search, FileText, Plus, User } from 'lucide-react';
 
 export default function MedicalRecords() {
@@ -20,6 +20,10 @@ export default function MedicalRecords() {
         prescription: ''
     });
 
+    const API_URL = 'http://localhost:8080/api/medical-records';
+    const PATIENTS_URL = 'http://localhost:8080/api/patients';
+    const DOCTORS_URL = 'http://localhost:8080/api/doctors';
+
     useEffect(() => {
         fetchPatientsAndDoctors();
     }, []);
@@ -27,34 +31,24 @@ export default function MedicalRecords() {
     const fetchPatientsAndDoctors = async () => {
         try {
             const [patRes, docRes] = await Promise.all([
-                supabase.from('patients').select('id, name, contactNo'),
-                supabase.from('doctors').select('id, name, specialization')
+                axios.get(PATIENTS_URL),
+                axios.get(DOCTORS_URL)
             ]);
-
-            if (patRes.error) throw patRes.error;
-            if (docRes.error) throw docRes.error;
-
-            setPatients(patRes.data || []);
+            // Handle paginated responses
+            setPatients(patRes.data.content || patRes.data || []);
             setDoctors(docRes.data || []);
         } catch (error) {
             console.error("Error fetching data:", error);
+            setPatients([]);
+            setDoctors([]);
         }
     };
 
     const fetchRecords = async (patientId) => {
         setLoading(true);
         try {
-            const { data, error } = await supabase
-                .from('medical_records')
-                .select(`
-                    *,
-                    doctor:doctors(id, name, specialization)
-                `)
-                .eq('patient_id', patientId)
-                .order('created_at', { ascending: false });
-
-            if (error) throw error;
-            setRecords(data || []);
+            const response = await axios.get(`${API_URL}/patient/${patientId}`);
+            setRecords(response.data);
         } catch (error) {
             console.error("Error fetching records:", error);
         } finally {
@@ -73,17 +67,10 @@ export default function MedicalRecords() {
         if (!selectedPatient) return;
 
         try {
-            const { error } = await supabase
-                .from('medical_records')
-                .insert([{
-                    patient_id: selectedPatient.id,
-                    doctor_id: formData.doctorId,
-                    diagnosis: formData.diagnosis,
-                    prescription: formData.prescription
-                }]);
-
-            if (error) throw error;
-
+            await axios.post(API_URL, {
+                patientId: selectedPatient.id,
+                ...formData
+            });
             setShowForm(false);
             setFormData({ doctorId: '', diagnosis: '', prescription: '' });
             fetchRecords(selectedPatient.id);

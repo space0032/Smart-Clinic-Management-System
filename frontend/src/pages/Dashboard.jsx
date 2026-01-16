@@ -28,10 +28,12 @@ export default function Dashboard() {
                 axios.get('http://localhost:8080/api/appointments')
             ]);
             setStats(statsRes.data);
-            // Get recent 5 appointments
-            setRecentAppointments(appointmentsRes.data.slice(0, 5));
+            // Get recent 5 appointments - handle paginated response
+            const appointments = appointmentsRes.data.content || appointmentsRes.data || [];
+            setRecentAppointments(appointments.slice(0, 5));
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
+            setRecentAppointments([]);
         } finally {
             setLoading(false);
         }
