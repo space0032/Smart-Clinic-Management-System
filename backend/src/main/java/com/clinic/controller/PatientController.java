@@ -39,7 +39,7 @@ public class PatientController {
 
     @PostMapping
     @SuppressWarnings("null")
-    public Patient createPatient(@RequestBody Patient patient) {
+    public Patient createPatient(@RequestBody @jakarta.validation.Valid Patient patient) {
         Patient savedPatient = Optional.ofNullable(patientRepository.save(patient))
                 .orElseThrow(() -> new RuntimeException("Failed to save patient"));
 
@@ -63,7 +63,8 @@ public class PatientController {
 
     @PutMapping("/{id}")
     @SuppressWarnings("null")
-    public ResponseEntity<Patient> updatePatient(@PathVariable @NonNull UUID id, @RequestBody Patient patientDetails) {
+    public ResponseEntity<Patient> updatePatient(@PathVariable @NonNull UUID id,
+            @RequestBody @jakarta.validation.Valid Patient patientDetails) {
         return patientRepository.findById(id)
                 .map(patient -> {
                     patient.setName(patientDetails.getName());

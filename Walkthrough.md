@@ -77,10 +77,6 @@ toast.info("New update available");
 
 ### Dark Mode Polish
 - **Dashboard**: Fixed "Quick Actions" card to have proper dark background and text contrast.
-- **Billing**: Fixed table row hover state to ensure text remains visible (no white-on-white).
-- **Prescriptions**: Improved contrast for modal labels and details.
-- **Patients/Doctors/Appointments**: Applied comprehensive dark mode text contrast fixes.
-
 ### Bug Fixes
 - **Appointments Page**: Fixed "Confirm" and "Cancel" buttons by correcting the API call endpoint (switched from `/status` to primary PUT endpoint with JSON body).
 - **Settings Page**: Fixed syntax error in JSX structure.
@@ -95,6 +91,11 @@ toast.info("New update available");
 - **Foreign Key Violation Fix**: Updated `Patient.java` with `CascadeType.ALL` to ensure Appointments, Medical Records, etc. are deleted when a Patient is deleted. Updated `PatientController` to also clean up associated User accounts.
 - **Lazy User Migration**: Updated `AuthController` to automatically create User accounts (with default password `Patient123`) for existing patients who try to log in but don't have credentials yet.
 - **Cleanup**: Removed unused imports across controllers.
+
+### API Validation & Error Handling
+- **Global Error Handler**: Implemented `GlobalExceptionHandler` to catch validation errors and return structured 400 Bad Request responses with field-level details.
+- **Input Validation**: Added Jakarta Validation annotations (`@NotBlank`, `@Email`, `@Future`, etc.) to `Patient`, `Doctor`, and `AppointmentRequest` models.
+- **Enforcement**: Enabled `@Valid` in `PatientController`, `DoctorController`, and `AppointmentController` to enforce data integrity at the API entry point.
 
 ### Next Steps
 - Address backend compilation errors (missing `Bill` imports).

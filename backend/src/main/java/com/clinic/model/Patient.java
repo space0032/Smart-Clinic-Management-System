@@ -14,18 +14,25 @@ public class Patient {
     private UUID id;
 
     @Column(nullable = false)
+    @jakarta.validation.constraints.NotBlank(message = "Name is required")
+    @jakarta.validation.constraints.Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
     private String name;
 
     @Column
+    @jakarta.validation.constraints.Min(value = 0, message = "Age must be non-negative")
+    @jakarta.validation.constraints.Max(value = 150, message = "Age must be less than 150")
     private Integer age;
 
     @Column
     private String gender;
 
     @Column(unique = true)
+    @jakarta.validation.constraints.NotBlank(message = "Email is required")
+    @jakarta.validation.constraints.Email(message = "Invalid email format")
     private String email;
 
     @Column
+    @jakarta.validation.constraints.Pattern(regexp = "^\\+?[0-9. ()-]{7,25}$", message = "Invalid phone number")
     private String phone;
 
     @Column(columnDefinition = "TEXT")

@@ -45,7 +45,8 @@ public class AppointmentController {
     }
 
     @PostMapping
-    public ResponseEntity<Appointment> createAppointment(@RequestBody AppointmentRequest request) {
+    public ResponseEntity<Appointment> createAppointment(
+            @RequestBody @jakarta.validation.Valid AppointmentRequest request) {
         Patient patient = patientRepository.findById(Objects.requireNonNull(request.patientId)).orElse(null);
         Doctor doctor = doctorRepository.findById(Objects.requireNonNull(request.doctorId)).orElse(null);
 
@@ -69,7 +70,7 @@ public class AppointmentController {
     @PutMapping("/{id}")
     @SuppressWarnings("null")
     public ResponseEntity<Appointment> updateAppointment(@PathVariable @NonNull UUID id,
-            @RequestBody AppointmentRequest request) {
+            @RequestBody @jakarta.validation.Valid AppointmentRequest request) {
         return appointmentRepository.findById(id)
                 .map(appointment -> {
                     if (request.appointmentDate != null)
@@ -98,11 +99,20 @@ public class AppointmentController {
 
     // DTO
     public static class AppointmentRequest {
+        @jakarta.validation.constraints.NotNull(message = "Patient ID is required")
         public UUID patientId;
+
+        @jakarta.validation.constraints.NotNull(message = "Doctor ID is required")
         public UUID doctorId;
+
+        @jakarta.validation.constraints.NotNull(message = "Appointment date is required")
+        @jakarta.validation.constraints.Future(message = "Appointment date must be in the future")
         public java.time.LocalDateTime appointmentDate;
+
         public String status;
+
         public String reason;
+
         public String notes;
     }
 }

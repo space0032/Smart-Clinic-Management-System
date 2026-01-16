@@ -13,15 +13,21 @@ public class Doctor {
     private UUID id;
 
     @Column(nullable = false)
+    @jakarta.validation.constraints.NotBlank(message = "Name is required")
+    @jakarta.validation.constraints.Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
     private String name;
 
     @Column
+    @jakarta.validation.constraints.NotBlank(message = "Specialization is required")
     private String specialization;
 
     @Column(unique = true)
+    @jakarta.validation.constraints.NotBlank(message = "Email is required")
+    @jakarta.validation.constraints.Email(message = "Invalid email format")
     private String email;
 
     @Column
+    @jakarta.validation.constraints.Pattern(regexp = "^\\+?[0-9. ()-]{7,25}$", message = "Invalid phone number")
     private String phone;
 
     @Column(columnDefinition = "TEXT")
