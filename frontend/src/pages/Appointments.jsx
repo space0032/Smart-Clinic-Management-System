@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Plus, Calendar as CalendarIcon, Clock, User, Stethoscope, CheckCircle, XCircle } from 'lucide-react';
+import { Plus, Calendar as CalendarIcon, Clock, User, Stethoscope, CheckCircle, XCircle, LayoutGrid, List } from 'lucide-react';
+import CalendarView from '../components/CalendarView';
 
 export default function Appointments() {
     const [appointments, setAppointments] = useState([]);
@@ -8,6 +9,7 @@ export default function Appointments() {
     const [patients, setPatients] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
+    const [viewMode, setViewMode] = useState('list'); // 'list' | 'calendar'
 
     // Form State
     const [formData, setFormData] = useState({
@@ -59,6 +61,19 @@ export default function Appointments() {
         }
     };
 
+    const handleDateClick = (date) => {
+        // Format date to local ISO string (YYYY-MM-DDTHH:MM) for datetime-local input
+        // Simple trick to get local ISO string
+        const offset = date.getTimezoneOffset() * 60000;
+        const localISOTime = (new Date(date.getTime() - offset)).toISOString().slice(0, 16);
+
+        // Default to 9:00 AM on that day
+        const defaultTime = localISOTime.split('T')[0] + 'T09:00';
+
+        setFormData({ ...formData, appointmentDate: defaultTime });
+        setShowForm(true);
+    };
+
     const handleStatusUpdate = async (id, status) => {
         try {
             await axios.put(`${API_URL}/${id}/status?status=${status}`);
@@ -82,13 +97,31 @@ export default function Appointments() {
                     <h1 className="text-2xl font-bold text-gray-800 dark:text-slate-100">Appointments</h1>
                     <p className="text-gray-500 dark:text-slate-400">Schedule and manage visits</p>
                 </div>
-                <button
-                    onClick={() => setShowForm(!showForm)}
-                    className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-                >
-                    <Plus className="w-5 h-5 mr-2" />
-                    New Appointment
-                </button>
+                <div className="flex gap-2">
+                    <div className="bg-white dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700 flex">
+                        <button
+                            onClick={() => setViewMode('list')}
+                            className={`p-2 rounded-md transition-colors ${viewMode === 'list' ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+                            title="List View"
+                        >
+                            <List className="w-5 h-5" />
+                        </button>
+                        <button
+                            onClick={() => setViewMode('calendar')}
+                            className={`p-2 rounded-md transition-colors ${viewMode === 'calendar' ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+                            title="Calendar View"
+                        >
+                            <LayoutGrid className="w-5 h-5" />
+                        </button>
+                    </div>
+                    <button
+                        onClick={() => setShowForm(!showForm)}
+                        className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                    >
+                        <Plus className="w-5 h-5 mr-2" />
+                        New Appointment
+                    </button>
+                </div>
             </div>
 
             {showForm && (
@@ -169,62 +202,67 @@ export default function Appointments() {
             )}
 
             {/* Appointment Cards */}
-            <div className="space-y-4">
-                {loading ? (
-                    <div className="text-gray-500 dark:text-slate-400 text-center py-8">Loading appointments...</div>
-                ) : appointments.length === 0 ? (
-                    <div className="text-gray-500 dark:text-slate-400 text-center py-8 bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700">
-                        <CalendarIcon className="w-12 h-12 mx-auto text-gray-200 mb-3" />
-                        <p>No appointments scheduled.</p>
-                    </div>
-                ) : (
-                    appointments.map((appt) => (
-                        <div key={appt.id} className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                            <div className="flex items-start space-x-4">
-                                <div className="bg-indigo-50 dark:bg-indigo-900/20 p-3 rounded-lg text-center min-w-[80px]">
-                                    <span className="block text-sm font-semibold text-indigo-600 dark:text-indigo-400">
-                                        {new Date(appt.appointmentDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                                    </span>
-                                    <span className="block text-xl font-bold text-indigo-800 dark:text-indigo-200">
-                                        {new Date(appt.appointmentDate).getHours()}:{String(new Date(appt.appointmentDate).getMinutes()).padStart(2, '0')}
-                                    </span>
-                                </div>
-                                <div>
-                                    <div className="flex items-center gap-2">
-                                        <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{appt.patient?.name || 'Unknown Patient'}</h3>
-                                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium uppercase ${statusColors[appt.status] || 'bg-gray-100'}`}>
-                                            {appt.status}
+            {/* Appointment Cards or Calendar */}
+            {viewMode === 'calendar' ? (
+                <CalendarView appointments={appointments} onDateClick={handleDateClick} />
+            ) : (
+                <div className="space-y-4">
+                    {loading ? (
+                        <div className="text-gray-500 dark:text-slate-400 text-center py-8">Loading appointments...</div>
+                    ) : appointments.length === 0 ? (
+                        <div className="text-gray-500 dark:text-slate-400 text-center py-8 bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700">
+                            <CalendarIcon className="w-12 h-12 mx-auto text-gray-200 mb-3" />
+                            <p>No appointments scheduled.</p>
+                        </div>
+                    ) : (
+                        appointments.map((appt) => (
+                            <div key={appt.id} className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                                <div className="flex items-start space-x-4">
+                                    <div className="bg-indigo-50 dark:bg-indigo-900/20 p-3 rounded-lg text-center min-w-[80px]">
+                                        <span className="block text-sm font-semibold text-indigo-600 dark:text-indigo-400">
+                                            {new Date(appt.appointmentDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                        </span>
+                                        <span className="block text-xl font-bold text-indigo-800 dark:text-indigo-200">
+                                            {new Date(appt.appointmentDate).getHours()}:{String(new Date(appt.appointmentDate).getMinutes()).padStart(2, '0')}
                                         </span>
                                     </div>
-                                    <div className="flex items-center text-sm text-gray-500 dark:text-slate-400 mt-1">
-                                        <Stethoscope className="w-4 h-4 mr-1" />
-                                        {appt.doctor?.name || 'Unknown Doctor'} ({appt.doctor?.specialization})
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{appt.patient?.name || 'Unknown Patient'}</h3>
+                                            <span className={`px-2 py-0.5 rounded-full text-xs font-medium uppercase ${statusColors[appt.status] || 'bg-gray-100'}`}>
+                                                {appt.status}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center text-sm text-gray-500 dark:text-slate-400 mt-1">
+                                            <Stethoscope className="w-4 h-4 mr-1" />
+                                            {appt.doctor?.name || 'Unknown Doctor'} ({appt.doctor?.specialization})
+                                        </div>
+                                        {appt.notes && <p className="text-sm text-gray-400 dark:text-slate-500 mt-1 italic">"{appt.notes}"</p>}
                                     </div>
-                                    {appt.notes && <p className="text-sm text-gray-400 dark:text-slate-500 mt-1 italic">"{appt.notes}"</p>}
+                                </div>
+
+                                <div className="flex gap-2">
+                                    {appt.status === 'SCHEDULED' && (
+                                        <>
+                                            <button onClick={() => handleStatusUpdate(appt.id, 'CONFIRMED')} className="px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 hover:bg-green-100 rounded-lg flex items-center">
+                                                <CheckCircle className="w-3 h-3 mr-1" /> Confirm
+                                            </button>
+                                            <button onClick={() => handleStatusUpdate(appt.id, 'CANCELLED')} className="px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg flex items-center">
+                                                <XCircle className="w-3 h-3 mr-1" /> Cancel
+                                            </button>
+                                        </>
+                                    )}
+                                    {appt.status === 'CONFIRMED' && (
+                                        <button onClick={() => handleStatusUpdate(appt.id, 'COMPLETED')} className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg">
+                                            Mark Complete
+                                        </button>
+                                    )}
                                 </div>
                             </div>
-
-                            <div className="flex gap-2">
-                                {appt.status === 'SCHEDULED' && (
-                                    <>
-                                        <button onClick={() => handleStatusUpdate(appt.id, 'CONFIRMED')} className="px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 hover:bg-green-100 rounded-lg flex items-center">
-                                            <CheckCircle className="w-3 h-3 mr-1" /> Confirm
-                                        </button>
-                                        <button onClick={() => handleStatusUpdate(appt.id, 'CANCELLED')} className="px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg flex items-center">
-                                            <XCircle className="w-3 h-3 mr-1" /> Cancel
-                                        </button>
-                                    </>
-                                )}
-                                {appt.status === 'CONFIRMED' && (
-                                    <button onClick={() => handleStatusUpdate(appt.id, 'COMPLETED')} className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg">
-                                        Mark Complete
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    ))
-                )}
-            </div>
+                        ))
+                    )}
+                </div>
+            )}
         </div>
     );
 }

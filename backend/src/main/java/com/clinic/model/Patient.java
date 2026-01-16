@@ -40,6 +40,18 @@ public class Patient {
     @Column
     private String bloodGroup;
 
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<Appointment> appointments = new java.util.ArrayList<>();
+
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<MedicalRecord> medicalRecords = new java.util.ArrayList<>();
+
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<Prescription> prescriptions = new java.util.ArrayList<>();
+
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<Bill> bills = new java.util.ArrayList<>();
+
     public Patient() {
     }
 

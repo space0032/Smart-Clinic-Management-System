@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
-import { Dashboard, Patients, Doctors, Appointments, MedicalRecords, Billing, SearchPage, Login, Reports, Settings, Prescriptions } from './pages/Pages';
+import { Dashboard, Patients, Doctors, Appointments, MedicalRecords, Billing, SearchPage, Login, Reports, Settings, Prescriptions, PatientDashboard } from './pages/Pages';
 
 import PrivateRoute from './components/PrivateRoute';
 
@@ -9,6 +9,7 @@ const App = () => {
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/patient-portal" element={<PatientDashboard />} />
 
         {/* Protected Routes */}
         <Route element={<PrivateRoute />}>

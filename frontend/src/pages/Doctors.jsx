@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Plus, Search, Trash2, Edit2, Stethoscope } from 'lucide-react';
+import { Plus, Search, Trash2, Edit2, Stethoscope, Calendar as CalendarIcon } from 'lucide-react';
+import ScheduleEditor from '../components/ScheduleEditor';
 
 export default function Doctors() {
     const [doctors, setDoctors] = useState([]);
@@ -8,13 +9,16 @@ export default function Doctors() {
     const [showForm, setShowForm] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
 
+    const [showScheduleEditor, setShowScheduleEditor] = useState(false);
+    const [selectedDoctor, setSelectedDoctor] = useState(null);
+
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         specialization: 'General',
         experienceYears: '',
         contactNo: '',
-        availabilitySchedule: ''
+        availability: ''
     });
 
     const API_URL = 'http://localhost:8080/api/doctors';
@@ -41,7 +45,7 @@ export default function Doctors() {
             setShowForm(false);
             setFormData({
                 name: '', email: '', specialization: 'General',
-                experienceYears: '', contactNo: '', availabilitySchedule: ''
+                experienceYears: '', contactNo: '', availability: ''
             });
             fetchDoctors();
         } catch (error) {
@@ -57,6 +61,22 @@ export default function Doctors() {
             fetchDoctors();
         } catch (error) {
             console.error("Error deleting doctor:", error);
+        }
+    };
+
+    const handleOpenSchedule = (doctor) => {
+        setSelectedDoctor(doctor);
+        setShowScheduleEditor(true);
+    };
+
+    const handleSaveSchedule = async (id, updatedDoctor) => {
+        try {
+            await axios.put(`${API_URL}/${id}`, updatedDoctor);
+            setShowScheduleEditor(false);
+            fetchDoctors();
+        } catch (error) {
+            console.error("Error updating schedule:", error);
+            alert("Failed to update schedule");
         }
     };
 
@@ -122,9 +142,9 @@ export default function Doctors() {
                             value={formData.contactNo} onChange={e => setFormData({ ...formData, contactNo: e.target.value })}
                         />
                         <input
-                            type="text" placeholder="Schedule (e.g. Mon-Fri 9-5)"
+                            type="text" placeholder="Availability Info (Optional)"
                             className="p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-lg focus:ring-2 focus:ring-primary-400"
-                            value={formData.availabilitySchedule} onChange={e => setFormData({ ...formData, availabilitySchedule: e.target.value })}
+                            value={formData.availability} onChange={e => setFormData({ ...formData, availability: e.target.value })}
                         />
 
                         <div className="md:col-span-2 flex justify-end gap-3 mt-2">
@@ -165,8 +185,11 @@ export default function Doctors() {
                             <p className="text-slate-400 dark:text-slate-500 text-xs mt-1">{doc.email}</p>
 
                             <div className="flex gap-2 mt-6 w-full">
-                                <button className="flex-1 py-2 text-primary-700 dark:text-teal-300 bg-primary-50 dark:bg-teal-900/30 rounded-lg text-sm font-medium hover:bg-primary-100 dark:hover:bg-teal-900/50 transition-colors">
-                                    View Profile
+                                <button
+                                    onClick={() => handleOpenSchedule(doc)}
+                                    className="flex-1 py-2 text-primary-700 dark:text-teal-300 bg-primary-50 dark:bg-teal-900/30 rounded-lg text-sm font-medium hover:bg-primary-100 dark:hover:bg-teal-900/50 transition-colors flex items-center justify-center"
+                                >
+                                    <CalendarIcon className="w-3 h-3 mr-1" /> Schedule
                                 </button>
                                 <button onClick={() => handleDelete(doc.id)} className="p-2 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors">
                                     <Trash2 className="w-4 h-4" />
@@ -176,6 +199,14 @@ export default function Doctors() {
                     ))
                 )}
             </div>
+
+            {showScheduleEditor && selectedDoctor && (
+                <ScheduleEditor
+                    doctor={selectedDoctor}
+                    onClose={() => setShowScheduleEditor(false)}
+                    onSave={handleSaveSchedule}
+                />
+            )}
         </div>
     );
 }

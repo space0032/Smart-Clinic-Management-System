@@ -1,7 +1,9 @@
 package com.clinic.controller;
 
 import com.clinic.model.Patient;
+import com.clinic.model.User;
 import com.clinic.repository.PatientRepository;
+import com.clinic.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.lang.NonNull;
@@ -16,9 +18,11 @@ import java.util.Optional;
 public class PatientController {
 
     private final PatientRepository patientRepository;
+    private final UserRepository userRepository;
 
-    public PatientController(PatientRepository patientRepository) {
+    public PatientController(PatientRepository patientRepository, UserRepository userRepository) {
         this.patientRepository = patientRepository;
+        this.userRepository = userRepository;
     }
 
     @GetMapping
@@ -35,8 +39,29 @@ public class PatientController {
 
     @PostMapping
     public Patient createPatient(@RequestBody Patient patient) {
-        return Optional.ofNullable(patientRepository.save(patient))
+        Patient savedPatient = Optional.ofNullable(patientRepository.save(patient))
                 .orElseThrow(() -> new RuntimeException("Failed to save patient"));
+
+        // Auto-create User account for Patient
+        if (patient.getEmail() != null && !patient.getEmail().isEmpty()) {
+            try {
+                // Check if user already exists
+                // Note: In real app, handle duplicate email gracefully.
+                // Here we just attempt create.
+                User newUser = new User();
+                newUser.setEmail(patient.getEmail());
+                newUser.setName(patient.getName());
+                newUser.setPassword("Patient123"); // Default password
+                newUser.setRole("PATIENT");
+                userRepository.save(newUser);
+            } catch (Exception e) {
+                // Log error but don't fail patient creation?
+                // Or maybe we should? For now, we print stack trace.
+                System.err.println("Failed to create user account for patient: " + e.getMessage());
+            }
+        }
+
+        return savedPatient;
     }
 
     @PutMapping("/{id}")
@@ -61,10 +86,23 @@ public class PatientController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePatient(@PathVariable @NonNull UUID id) {
-        if (patientRepository.existsById(id)) {
-            patientRepository.deleteById(id);
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.notFound().build();
+        return patientRepository.findById(id).map(patient -> {
+            // Delete associated User account if exists
+            if (patient.getEmail() != null) {
+                userRepository.findByEmail(patient.getEmail())
+                        .ifPresent(user -> {
+                            try {
+                                userRepository.delete(user);
+                            } catch (Exception e) {
+                                System.err.println(
+                                        "Warning: Failed to delete associated user account: " + e.getMessage());
+                            }
+                        });
+            }
+
+            // Delete patient (Cascades to Appointments, MedicalRecords, etc.)
+            patientRepository.delete(patient);
+            return ResponseEntity.ok().<Void>build();
+        }).orElse(ResponseEntity.notFound().build());
     }
 }

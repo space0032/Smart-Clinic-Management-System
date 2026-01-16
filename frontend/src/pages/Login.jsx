@@ -26,7 +26,11 @@ export default function Login() {
 
             if (response.data.success) {
                 localStorage.setItem('clinicUser', JSON.stringify(response.data.user));
-                navigate('/');
+                if (response.data.user.role === 'PATIENT') {
+                    navigate('/patient-portal');
+                } else {
+                    navigate('/');
+                }
             } else {
                 setMessage('Error: ' + response.data.message);
             }

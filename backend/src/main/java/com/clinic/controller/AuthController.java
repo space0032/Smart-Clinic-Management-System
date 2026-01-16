@@ -14,14 +14,34 @@ import java.util.Map;
 public class AuthController {
 
     private final UserRepository userRepository;
+    private final com.clinic.repository.PatientRepository patientRepository;
 
-    public AuthController(UserRepository userRepository) {
+    public AuthController(UserRepository userRepository, com.clinic.repository.PatientRepository patientRepository) {
         this.userRepository = userRepository;
+        this.patientRepository = patientRepository;
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        return userRepository.findByEmail(request.email)
+        // Try to find user
+        java.util.Optional<User> userOpt = userRepository.findByEmail(request.email);
+
+        // If user not found, check if it's an existing patient without an account
+        if (userOpt.isEmpty()) {
+            java.util.List<com.clinic.model.Patient> patients = patientRepository.findByEmail(request.email);
+            if (!patients.isEmpty()) {
+                com.clinic.model.Patient patient = patients.get(0);
+                // Create user for this patient
+                User newUser = new User();
+                newUser.setEmail(patient.getEmail());
+                newUser.setName(patient.getName());
+                newUser.setPassword("Patient123"); // Default
+                newUser.setRole("PATIENT");
+                userOpt = java.util.Optional.of(userRepository.save(newUser));
+            }
+        }
+
+        return userOpt
                 .map(user -> {
                     // Simple password check (in production, use BCrypt)
                     if (user.getPassword().equals(request.password)) {
