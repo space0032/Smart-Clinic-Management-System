@@ -102,6 +102,10 @@ toast.info("New update available");
 - **Excel Export**: Integrated `Apache POI` to generate multi-sheet Excel workbooks with full data for Patients, Appointments, and Financials.
 - **Frontend**: Updated `Reports.jsx` to trigger backend endpoints `/api/reports/export/pdf` and `/api/reports/export/excel`.
 
+### Database Indexing & Pagination
+- **Indexing**: Added `@Index` annotations to `Patient` (email, name), `Doctor` (email, specialization), and `Appointment` (date, status) entities to optimize lookups.
+- **Pagination**: Updated `PatientController` and `AppointmentController` to support `Pageable` requests (e.g., `?page=0&size=10`), returning paginated `Page<T>` responses.
+
 ### Next Steps
 - Address backend compilation errors (missing `Bill` imports).
 - Fix null safety warnings in Java controllers.

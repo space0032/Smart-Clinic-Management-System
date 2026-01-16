@@ -127,19 +127,23 @@ public class PdfReportService {
 
         List<Appointment> appointments = appointmentRepository.findAll();
         // Limit to last 20 for brief report
+        // Limit to last 20 from those with valid dates
         appointments.stream()
+                .filter(a -> a.getAppointmentDate() != null)
                 .sorted((a1, a2) -> a2.getAppointmentDate().compareTo(a1.getAppointmentDate()))
                 .limit(20)
                 .forEach(app -> {
-                    table.addCell(
-                            new Phrase(app.getAppointmentDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
-                                    dataFont));
-                    table.addCell(
-                            new Phrase(app.getPatient() != null ? app.getPatient().getName() : "Unknown", dataFont));
-                    table.addCell(
-                            new Phrase(app.getDoctor() != null ? app.getDoctor().getName() : "Unknown", dataFont));
-                    table.addCell(new Phrase(app.getStatus(), dataFont));
-                    table.addCell(new Phrase(app.getReason(), dataFont));
+                    String dateStr = app.getAppointmentDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+                    String patientName = app.getPatient() != null ? app.getPatient().getName() : "Unknown";
+                    String doctorName = app.getDoctor() != null ? app.getDoctor().getName() : "Unknown";
+                    String status = app.getStatus() != null ? app.getStatus() : "N/A";
+                    String reason = app.getReason() != null ? app.getReason() : "N/A";
+
+                    table.addCell(new Phrase(dateStr, dataFont));
+                    table.addCell(new Phrase(patientName, dataFont));
+                    table.addCell(new Phrase(doctorName, dataFont));
+                    table.addCell(new Phrase(status, dataFont));
+                    table.addCell(new Phrase(reason, dataFont));
                 });
 
         document.add(table);

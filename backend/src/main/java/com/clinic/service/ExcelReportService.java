@@ -117,11 +117,14 @@ public class ExcelReportService {
         for (Appointment app : appointments) {
             Row row = sheet.createRow(rowIdx++);
             row.createCell(0).setCellValue(app.getId().toString());
-            row.createCell(1).setCellValue(app.getAppointmentDate().format(formatter));
+
+            String dateStr = app.getAppointmentDate() != null ? app.getAppointmentDate().format(formatter) : "N/A";
+            row.createCell(1).setCellValue(dateStr);
+
             row.createCell(2).setCellValue(app.getPatient() != null ? app.getPatient().getName() : "Unknown");
             row.createCell(3).setCellValue(app.getDoctor() != null ? app.getDoctor().getName() : "Unknown");
-            row.createCell(4).setCellValue(app.getStatus());
-            row.createCell(5).setCellValue(app.getReason());
+            row.createCell(4).setCellValue(app.getStatus() != null ? app.getStatus() : "N/A");
+            row.createCell(5).setCellValue(app.getReason() != null ? app.getReason() : "");
         }
     }
 
@@ -141,9 +144,15 @@ public class ExcelReportService {
             Row row = sheet.createRow(rowIdx++);
             row.createCell(0).setCellValue(bill.getId().toString());
             row.createCell(1).setCellValue(bill.getPatient() != null ? bill.getPatient().getName() : "Unknown");
-            row.createCell(2).setCellValue(bill.getAmount().doubleValue());
-            row.createCell(3).setCellValue(bill.getStatus().toString());
-            row.createCell(4).setCellValue(bill.getIssueDate().format(formatter));
+
+            double amount = bill.getAmount() != null ? bill.getAmount().doubleValue() : 0.0;
+            row.createCell(2).setCellValue(amount);
+
+            String status = bill.getStatus() != null ? bill.getStatus().toString() : "N/A";
+            row.createCell(3).setCellValue(status);
+
+            String dateStr = bill.getIssueDate() != null ? bill.getIssueDate().format(formatter) : "N/A";
+            row.createCell(4).setCellValue(dateStr);
         }
     }
 }
