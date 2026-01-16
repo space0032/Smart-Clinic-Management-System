@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { supabase } from '../utils/supabase';
 import { Plus, Search, Trash2, Edit2, Stethoscope, Calendar as CalendarIcon } from 'lucide-react';
 import ScheduleEditor from '../components/ScheduleEditor';
 
@@ -21,16 +21,19 @@ export default function Doctors() {
         availability: ''
     });
 
-    const API_URL = 'http://localhost:8080/api/doctors';
-
     useEffect(() => {
         fetchDoctors();
     }, []);
 
     const fetchDoctors = async () => {
         try {
-            const response = await axios.get(API_URL);
-            setDoctors(response.data);
+            const { data, error } = await supabase
+                .from('doctors')
+                .select('*')
+                .order('name');
+
+            if (error) throw error;
+            setDoctors(data);
         } catch (error) {
             console.error("Error fetching doctors:", error);
         } finally {
@@ -41,7 +44,12 @@ export default function Doctors() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post(API_URL, formData);
+            const { error } = await supabase
+                .from('doctors')
+                .insert([formData]);
+
+            if (error) throw error;
+
             setShowForm(false);
             setFormData({
                 name: '', email: '', specialization: 'General',
@@ -57,12 +65,20 @@ export default function Doctors() {
     const handleDelete = async (id) => {
         if (!confirm("Are you sure?")) return;
         try {
-            await axios.delete(`${API_URL}/${id}`);
+            const { error } = await supabase
+                .from('doctors')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
             fetchDoctors();
         } catch (error) {
             console.error("Error deleting doctor:", error);
         }
     };
+
+    // ScheduleEditor Handling (Assuming doctor object has availability/schedule fields directly or relates to another table)
+    // For now, based on schema, 'availability' is a text field in doctors table. Refactoring to update that.
 
     const handleOpenSchedule = (doctor) => {
         setSelectedDoctor(doctor);
@@ -71,7 +87,16 @@ export default function Doctors() {
 
     const handleSaveSchedule = async (id, updatedDoctor) => {
         try {
-            await axios.put(`${API_URL}/${id}`, updatedDoctor);
+            // Remove id from update payload if present
+            const { id: _, ...updates } = updatedDoctor;
+
+            const { error } = await supabase
+                .from('doctors')
+                .update(updates)
+                .eq('id', id);
+
+            if (error) throw error;
+
             setShowScheduleEditor(false);
             fetchDoctors();
         } catch (error) {

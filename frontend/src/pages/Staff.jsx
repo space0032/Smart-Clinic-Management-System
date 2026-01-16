@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { supabase } from '../utils/supabase';
 import { useToast } from '../components/Toast';
 import {
     Users, Plus, Trash2, Edit, Shield, Mail, User
@@ -25,8 +25,13 @@ export default function Staff() {
     const fetchUsers = async () => {
         setLoading(true);
         try {
-            const response = await axios.get('http://localhost:8080/api/users');
-            setUsers(response.data);
+            const { data, error } = await supabase
+                .from('users')
+                .select('*')
+                .order('name');
+
+            if (error) throw error;
+            setUsers(data);
         } catch (error) {
             console.error('Error fetching users:', error);
             toast.show('Failed to fetch staff list', 'error');
@@ -38,24 +43,50 @@ export default function Staff() {
     const handleCreateUser = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:8080/api/users', formData);
-            toast.show('Staff member added successfully', 'success');
+            // Note: In a client-side only app, signUp signs the current user out.
+            // For this demo, we will just insert into the 'users' table directly to show it in the list
+            // Assuming the Trigger we wrote in SQL handles syncing or we just manage the 'users' table for display.
+            // OR we strictly warn this is a demo limitation.
+            // Let's try 'insert' into 'users' first as a "Record Creation" (Auth user creation typically needs Admin API)
+
+            // Actually, best "demo" path is to create the Auth user. But it will swap the session.
+            // Let's just Insert into public.users for now. The SQL Trigger 'handle_new_user' works on Auth->Public.
+            // We can't easily create an Auth user without signing out.
+            // WORKAROUND: Just insert into 'users' table so it appears in the list. They won't be able to login strictly unless they register.
+
+            const { error } = await supabase.from('users').insert([{
+                id: crypto.randomUUID(), // distinct ID from auth for this mock
+                email: formData.email,
+                name: formData.name,
+                role: formData.role,
+                // password is not stored in public table
+            }]);
+
+            if (error) throw error;
+
+            toast.show('Staff member added (Note: User needs to register to Login)', 'success');
             setShowModal(false);
             fetchUsers();
             setFormData({ name: '', email: '', password: '', role: 'DOCTOR' });
         } catch (error) {
-            const msg = error.response?.data || 'Failed to create user';
-            toast.show(typeof msg === 'string' ? msg : 'Failed to create user', 'error');
+            console.error('Create User Error:', error);
+            toast.show('Failed to create user', 'error');
         }
     };
 
     const handleDeleteUser = async (id) => {
         if (window.confirm('Are you sure you want to delete this user?')) {
             try {
-                await axios.delete(`http://localhost:8080/api/users/${id}`);
+                const { error } = await supabase
+                    .from('users')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
                 toast.show('User deleted successfully', 'success');
                 fetchUsers();
             } catch (error) {
+                console.error('Delete Error:', error);
                 toast.show('Failed to delete user', 'error');
             }
         }

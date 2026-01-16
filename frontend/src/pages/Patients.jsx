@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { supabase } from '../utils/supabase';
 import { Plus, Search, Trash2, Edit2 } from 'lucide-react';
 
 export default function Patients() {
@@ -20,7 +20,7 @@ export default function Patients() {
     });
 
     // Base API URL
-    const API_URL = 'http://localhost:8080/api/patients';
+    // Base API URL removed in favor of Supabase
 
     useEffect(() => {
         fetchPatients();
@@ -28,8 +28,13 @@ export default function Patients() {
 
     const fetchPatients = async () => {
         try {
-            const response = await axios.get(API_URL);
-            setPatients(response.data);
+            const { data, error } = await supabase
+                .from('patients')
+                .select('*')
+                .order('name');
+
+            if (error) throw error;
+            setPatients(data);
         } catch (error) {
             console.error("Error fetching patients:", error);
         } finally {
@@ -40,7 +45,12 @@ export default function Patients() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post(API_URL, formData);
+            const { error } = await supabase
+                .from('patients')
+                .insert([formData]);
+
+            if (error) throw error;
+
             setShowForm(false);
             setFormData({
                 name: '', email: '', contactNo: '', dateOfBirth: '',
@@ -56,7 +66,12 @@ export default function Patients() {
     const handleDelete = async (id) => {
         if (!confirm("Are you sure?")) return;
         try {
-            await axios.delete(`${API_URL}/${id}`);
+            const { error } = await supabase
+                .from('patients')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
             fetchPatients();
         } catch (error) {
             console.error("Error deleting patient:", error);

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { supabase } from '../utils/supabase';
 import { useToast } from '../components/Toast';
 import {
     FlaskConical, Plus, Search, FileText, Activity, AlertCircle, CheckCircle, Clock
@@ -20,7 +20,7 @@ export default function Laboratory() {
         notes: ''
     });
 
-    // Patients & Doctors for dropdowns (simplified - ideally fetch from API)
+    // Patients & Doctors for dropdowns
     const [patients, setPatients] = useState([]);
     const [doctors, setDoctors] = useState([]);
 
@@ -35,11 +35,32 @@ export default function Laboratory() {
         setLoading(true);
         try {
             if (activeTab === 'orders' || activeTab === 'results') {
-                const response = await axios.get('http://localhost:8080/api/lab/orders');
-                setOrders(response.data);
+                const { data, error } = await supabase
+                    .from('lab_orders')
+                    .select(`
+                        *,
+                        patient:patients(name),
+                        doctor:doctors(name)
+                    `)
+                    .order('order_date', { ascending: false });
+
+                if (error) throw error;
+                // Transform data to match UI expectations (flatten relations if needed or update UI)
+                // UI expects order.patient.name, Supabase returns object, so it works.
+                // But Supabase uses snake_case (order_date), UI used camelCase (orderDate).
+                // Let's map it or update UI usage. Updating logic to direct map is safer.
+                const mappedData = data.map(order => ({
+                    ...order,
+                    orderDate: order.order_date, // Map snake to camel
+                }));
+                setOrders(mappedData);
             } else if (activeTab === 'tests') {
-                const response = await axios.get('http://localhost:8080/api/lab/tests');
-                setTests(response.data);
+                const { data, error } = await supabase
+                    .from('lab_tests')
+                    .select('*')
+                    .order('name');
+                if (error) throw error;
+                setTests(data);
             }
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -52,11 +73,15 @@ export default function Laboratory() {
     const fetchDropdownData = async () => {
         try {
             const [patientsRes, doctorsRes] = await Promise.all([
-                axios.get('http://localhost:8080/api/patients?size=100'), // simplified
-                axios.get('http://localhost:8080/api/doctors')
+                supabase.from('patients').select('id, name'),
+                supabase.from('doctors').select('id, name, specialization')
             ]);
-            setPatients(patientsRes.data.content || []);
-            setDoctors(doctorsRes.data);
+
+            if (patientsRes.error) throw patientsRes.error;
+            if (doctorsRes.error) throw doctorsRes.error;
+
+            setPatients(patientsRes.data || []);
+            setDoctors(doctorsRes.data || []);
         } catch (error) {
             console.error('Error fetching dropdowns:', error);
         }
@@ -65,15 +90,25 @@ export default function Laboratory() {
     const handleCreateOrder = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:8080/api/lab/orders', newOrder);
+            const { error } = await supabase
+                .from('lab_orders')
+                .insert([{
+                    patient_id: newOrder.patientId,
+                    doctor_id: newOrder.doctorId,
+                    notes: newOrder.notes,
+                    status: 'PENDING',
+                    // order_date defaults to now()
+                }]);
+
+            if (error) throw error;
+
             toast.show('Lab order created successfully', 'success');
             setShowOrderModal(false);
             fetchData();
             setNewOrder({ patientId: '', doctorId: '', notes: '' });
         } catch (error) {
             console.error('Create Order Error:', error);
-            const msg = error.response?.data || 'Failed to create order';
-            toast.show(typeof msg === 'string' ? msg : 'Failed to create order', 'error');
+            toast.show('Failed to create order', 'error');
         }
     };
 
@@ -90,9 +125,13 @@ export default function Laboratory() {
     const handleUpdateStatus = async () => {
         if (!selectedOrder) return;
         try {
-            await axios.put(`http://localhost:8080/api/lab/orders/${selectedOrder.id}/status`, newStatus, {
-                headers: { 'Content-Type': 'text/plain' }
-            });
+            const { error } = await supabase
+                .from('lab_orders')
+                .update({ status: newStatus })
+                .eq('id', selectedOrder.id);
+
+            if (error) throw error;
+
             toast.show('Status updated successfully', 'success');
             setShowStatusModal(false);
             fetchData();

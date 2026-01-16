@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { supabase } from '../utils/supabase';
 import { Plus, Calendar as CalendarIcon, Clock, User, Stethoscope, CheckCircle, XCircle, LayoutGrid, List } from 'lucide-react';
 import CalendarView from '../components/CalendarView';
 
@@ -19,10 +19,6 @@ export default function Appointments() {
         notes: ''
     });
 
-    const API_URL = 'http://localhost:8080/api/appointments';
-    const DOCTORS_URL = 'http://localhost:8080/api/doctors';
-    const PATIENTS_URL = 'http://localhost:8080/api/patients';
-
     useEffect(() => {
         fetchData();
     }, []);
@@ -30,11 +26,26 @@ export default function Appointments() {
     const fetchData = async () => {
         try {
             const [apptRes, docRes, patRes] = await Promise.all([
-                axios.get(API_URL),
-                axios.get(DOCTORS_URL),
-                axios.get(PATIENTS_URL)
+                supabase.from('appointments').select(`
+                    *,
+                    patient:patients(id, name, contactNo),
+                    doctor:doctors(id, name, specialization)
+                `).order('appointment_date', { ascending: false }),
+                supabase.from('doctors').select('*'),
+                supabase.from('patients').select('*')
             ]);
-            setAppointments(apptRes.data);
+
+            if (apptRes.error) throw apptRes.error;
+            if (docRes.error) throw docRes.error;
+            if (patRes.error) throw patRes.error;
+
+            // Map snake_case to camelCase for consistency
+            const mappedAppointments = apptRes.data.map(appt => ({
+                ...appt,
+                appointmentDate: appt.appointment_date
+            }));
+
+            setAppointments(mappedAppointments);
             setDoctors(docRes.data);
             setPatients(patRes.data);
         } catch (error) {
@@ -47,9 +58,18 @@ export default function Appointments() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            // Format date for backend (LocalDateTime)
-            // Basic implementation: send raw string, ensure backend parses it or format properly
-            await axios.post(API_URL, formData);
+            const { error } = await supabase
+                .from('appointments')
+                .insert([{
+                    patient_id: formData.patientId,
+                    doctor_id: formData.doctorId,
+                    appointment_date: formData.appointmentDate,
+                    notes: formData.notes,
+                    status: 'SCHEDULED'
+                }]);
+
+            if (error) throw error;
+
             setShowForm(false);
             setFormData({
                 patientId: '', doctorId: '', appointmentDate: '', notes: ''
@@ -76,7 +96,12 @@ export default function Appointments() {
 
     const handleStatusUpdate = async (id, status) => {
         try {
-            await axios.put(`${API_URL}/${id}`, { status: status });
+            const { error } = await supabase
+                .from('appointments')
+                .update({ status })
+                .eq('id', id);
+
+            if (error) throw error;
             fetchData();
         } catch (error) {
             console.error("Error updating status:", error);
