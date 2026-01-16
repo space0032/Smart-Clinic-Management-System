@@ -97,6 +97,11 @@ toast.info("New update available");
 - **Input Validation**: Added Jakarta Validation annotations (`@NotBlank`, `@Email`, `@Future`, etc.) to `Patient`, `Doctor`, and `AppointmentRequest` models.
 - **Enforcement**: Enabled `@Valid` in `PatientController`, `DoctorController`, and `AppointmentController` to enforce data integrity at the API entry point.
 
+### Export Reports (PDF/Excel)
+- **PDF Export**: Integrated `OpenPDF` to generate executive summary reports containing stats and recent appointment tables.
+- **Excel Export**: Integrated `Apache POI` to generate multi-sheet Excel workbooks with full data for Patients, Appointments, and Financials.
+- **Frontend**: Updated `Reports.jsx` to trigger backend endpoints `/api/reports/export/pdf` and `/api/reports/export/excel`.
+
 ### Next Steps
 - Address backend compilation errors (missing `Bill` imports).
 - Fix null safety warnings in Java controllers.
@@ -210,6 +215,7 @@ const errors = validateForm(formData, {
 | `index.css` | Added toast animation |
 | `Layout.jsx` | Integrated ToastContainer |
 | `Settings.jsx` | Dark mode toggle, bug fixes |
+| `Reports.jsx` | Export PDF/Excel buttons |
 | `task.md` | Marked features complete |
 
 ---

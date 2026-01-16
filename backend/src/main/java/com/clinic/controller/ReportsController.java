@@ -6,6 +6,12 @@ import com.clinic.repository.AppointmentRepository;
 import com.clinic.repository.BillRepository;
 import com.clinic.repository.DoctorRepository;
 import com.clinic.repository.PatientRepository;
+import com.clinic.service.ExcelReportService;
+import com.clinic.service.PdfReportService;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -22,15 +28,21 @@ public class ReportsController {
         private final DoctorRepository doctorRepository;
         private final AppointmentRepository appointmentRepository;
         private final BillRepository billRepository;
+        private final PdfReportService pdfReportService;
+        private final ExcelReportService excelReportService;
 
         public ReportsController(PatientRepository patientRepository,
                         DoctorRepository doctorRepository,
                         AppointmentRepository appointmentRepository,
-                        BillRepository billRepository) {
+                        BillRepository billRepository,
+                        PdfReportService pdfReportService,
+                        ExcelReportService excelReportService) {
                 this.patientRepository = patientRepository;
                 this.doctorRepository = doctorRepository;
                 this.appointmentRepository = appointmentRepository;
                 this.billRepository = billRepository;
+                this.pdfReportService = pdfReportService;
+                this.excelReportService = excelReportService;
         }
 
         @GetMapping("/analytics")
@@ -104,5 +116,30 @@ public class ReportsController {
                 analytics.put("appointmentsByDoctor", appointmentsByDoctor);
 
                 return analytics;
+        }
+
+        @GetMapping("/export/pdf")
+        public ResponseEntity<InputStreamResource> exportPdf() {
+                var headers = new HttpHeaders();
+                headers.add("Content-Disposition", "attachment; filename=clinic_report.pdf");
+
+                return ResponseEntity
+                                .ok()
+                                .headers(headers)
+                                .contentType(MediaType.APPLICATION_PDF)
+                                .body(new InputStreamResource(pdfReportService.generateReport()));
+        }
+
+        @GetMapping("/export/excel")
+        public ResponseEntity<InputStreamResource> exportExcel() {
+                var headers = new HttpHeaders();
+                headers.add("Content-Disposition", "attachment; filename=clinic_report.xlsx");
+
+                return ResponseEntity
+                                .ok()
+                                .headers(headers)
+                                .contentType(MediaType.parseMediaType(
+                                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                                .body(new InputStreamResource(excelReportService.generateReport()));
         }
 }

@@ -24,45 +24,38 @@ export default function Reports() {
         }
     };
 
-    const handleExportCSV = () => {
-        if (!analytics) return;
+    const handleExportPdf = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/reports/export/pdf', {
+                responseType: 'blob',
+            });
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'clinic_report.pdf');
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } catch (error) {
+            console.error('Error exporting PDF:', error);
+        }
+    };
 
-        const headers = ["Category", "Metric", "Value"];
-        const rows = [
-            ["Overview", "Total Patients", analytics.totalPatients],
-            ["Overview", "Total Doctors", analytics.totalDoctors],
-            ["Overview", "Total Appointments", analytics.totalAppointments],
-            ["Overview", "Total Bills", analytics.totalBills],
-            ["Revenue", "Total Revenue", analytics.totalRevenue],
-            ["Revenue", "Pending Revenue", analytics.pendingRevenue],
-        ];
-
-        // Add Monthly Revenue
-        analytics.monthlyRevenue.forEach(m => {
-            rows.push(["Monthly Revenue", m.month, m.revenue]);
-        });
-
-        // Add Appointment Status
-        Object.entries(analytics.appointmentsByStatus).forEach(([status, count]) => {
-            rows.push(["Appointment Status", status, count]);
-        });
-
-        // Add Top Doctors
-        Object.entries(analytics.appointmentsByDoctor).forEach(([doc, count]) => {
-            rows.push(["Top Doctors", doc, count]);
-        });
-
-        const csvContent = "data:text/csv;charset=utf-8,"
-            + headers.join(",") + "\n"
-            + rows.map(e => e.join(",")).join("\n");
-
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "clinic_report.csv");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+    const handleExportExcel = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/reports/export/excel', {
+                responseType: 'blob',
+            });
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'clinic_report.xlsx');
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } catch (error) {
+            console.error('Error exporting Excel:', error);
+        }
     };
 
     if (loading) {
@@ -90,14 +83,14 @@ export default function Reports() {
                 </div>
                 <div className="flex gap-2">
                     <button
-                        onClick={() => window.print()}
+                        onClick={handleExportPdf}
                         className="flex items-center gap-2 px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                     >
                         <Download className="w-4 h-4" />
                         PDF
                     </button>
                     <button
-                        onClick={handleExportCSV}
+                        onClick={handleExportExcel}
                         className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                     >
                         <Download className="w-4 h-4" />
