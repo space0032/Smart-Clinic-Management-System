@@ -150,7 +150,7 @@ export default function MedicalRecords() {
                                             <label className="dark:text-slate-200 block text-sm font-medium text-gray-700 mb-1">Diagnosing Doctor</label>
                                             <select
                                                 required
-                                                className="w-full p-2 border rounded-lg"
+                                                className="w-full p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                                                 value={formData.doctorId}
                                                 onChange={e => setFormData({ ...formData, doctorId: e.target.value })}
                                             >
@@ -164,7 +164,7 @@ export default function MedicalRecords() {
                                             <label className="dark:text-slate-200 block text-sm font-medium text-gray-700 mb-1">Diagnosis</label>
                                             <textarea
                                                 required
-                                                className="w-full p-2 border rounded-lg h-20"
+                                                className="w-full p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-lg h-20 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                                                 placeholder="Enter clinical diagnosis..."
                                                 value={formData.diagnosis}
                                                 onChange={e => setFormData({ ...formData, diagnosis: e.target.value })}
@@ -173,14 +173,14 @@ export default function MedicalRecords() {
                                         <div>
                                             <label className="dark:text-slate-200 block text-sm font-medium text-gray-700 mb-1">Prescription</label>
                                             <textarea
-                                                className="w-full p-2 border rounded-lg h-20"
+                                                className="w-full p-2 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-lg h-20 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                                                 placeholder="Medications, dosage, instructions..."
                                                 value={formData.prescription}
                                                 onChange={e => setFormData({ ...formData, prescription: e.target.value })}
                                             />
                                         </div>
                                         <div className="flex justify-end gap-2">
-                                            <button type="button" onClick={() => setShowForm(false)} className="px-3 py-1.5 text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
+                                            <button type="button" onClick={() => setShowForm(false)} className="px-3 py-1.5 text-red-600 bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 rounded-lg font-medium transition-colors">Cancel</button>
                                             <button type="submit" className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Save Record</button>
                                         </div>
                                     </form>

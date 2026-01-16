@@ -1,0 +1,24 @@
+@media print {
+
+    .no-print,
+    aside,
+    header,
+    button {
+        display: none !important;
+    }
+
+    main {
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+    }
+
+    .bg-gray-50,
+    .dark\.bg-slate-900 {
+        background-color: white !important;
+    }
+
+    body {
+        color: black !important;
+    }
+}

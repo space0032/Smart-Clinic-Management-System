@@ -24,6 +24,47 @@ export default function Reports() {
         }
     };
 
+    const handleExportCSV = () => {
+        if (!analytics) return;
+
+        const headers = ["Category", "Metric", "Value"];
+        const rows = [
+            ["Overview", "Total Patients", analytics.totalPatients],
+            ["Overview", "Total Doctors", analytics.totalDoctors],
+            ["Overview", "Total Appointments", analytics.totalAppointments],
+            ["Overview", "Total Bills", analytics.totalBills],
+            ["Revenue", "Total Revenue", analytics.totalRevenue],
+            ["Revenue", "Pending Revenue", analytics.pendingRevenue],
+        ];
+
+        // Add Monthly Revenue
+        analytics.monthlyRevenue.forEach(m => {
+            rows.push(["Monthly Revenue", m.month, m.revenue]);
+        });
+
+        // Add Appointment Status
+        Object.entries(analytics.appointmentsByStatus).forEach(([status, count]) => {
+            rows.push(["Appointment Status", status, count]);
+        });
+
+        // Add Top Doctors
+        Object.entries(analytics.appointmentsByDoctor).forEach(([doc, count]) => {
+            rows.push(["Top Doctors", doc, count]);
+        });
+
+        const csvContent = "data:text/csv;charset=utf-8,"
+            + headers.join(",") + "\n"
+            + rows.map(e => e.join(",")).join("\n");
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "clinic_report.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     if (loading) {
         return <div className="flex items-center justify-center h-64 text-slate-500 dark:text-slate-400">Loading analytics...</div>;
     }
@@ -47,10 +88,22 @@ export default function Reports() {
                     <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Reports & Analytics</h1>
                     <p className="text-slate-500 dark:text-slate-400">Comprehensive clinic performance insights</p>
                 </div>
-                <button className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
-                    <Download className="w-4 h-4" />
-                    Export Report
-                </button>
+                <div className="flex gap-2">
+                    <button
+                        onClick={() => window.print()}
+                        className="flex items-center gap-2 px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                    >
+                        <Download className="w-4 h-4" />
+                        PDF
+                    </button>
+                    <button
+                        onClick={handleExportCSV}
+                        className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                    >
+                        <Download className="w-4 h-4" />
+                        Excel
+                    </button>
+                </div>
             </div>
 
             {/* Summary Cards */}

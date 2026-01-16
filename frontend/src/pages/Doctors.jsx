@@ -130,7 +130,7 @@ export default function Doctors() {
                         <div className="md:col-span-2 flex justify-end gap-3 mt-2">
                             <button
                                 type="button" onClick={() => setShowForm(false)}
-                                className="px-4 py-2 text-slate-600 dark:text-slate-200 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600"
+                                className="px-4 py-2 text-red-600 bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 rounded-lg font-medium transition-colors"
                             >
                                 Cancel
                             </button>

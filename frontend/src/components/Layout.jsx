@@ -129,7 +129,9 @@ const Layout = () => {
                         className="flex-1 max-w-md relative"
                         onSubmit={handleSearch}
                     >
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
+                        <button type="submit" className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-primary-500 transition-colors">
+                            <Search className="w-4 h-4" />
+                        </button>
                         <input
                             type="text"
                             placeholder="Search patients, doctors..."
