@@ -2,14 +2,19 @@ import { useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard, Users, Calendar, FileText, Settings, LogOut, Search,
-    Stethoscope, Activity, Menu, X, BarChart3
+    Stethoscope, Activity, Menu, X, BarChart3, Pill
 } from 'lucide-react';
+import { getUser, NAV_ITEMS } from '../utils/permissions';
 
 const Layout = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [sidebarOpen, setSidebarOpen] = useState(true);
+
+    // Get current user and filter navigation by role
+    const user = getUser();
+    const userRole = user.role || 'RECEPTIONIST';
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -18,16 +23,26 @@ const Layout = () => {
         }
     };
 
-    const navigation = [
-        { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-        { name: 'Patients', href: '/patients', icon: Users },
-        { name: 'Doctors', href: '/doctors', icon: Stethoscope },
-        { name: 'Appointments', href: '/appointments', icon: Calendar },
-        { name: 'Records', href: '/medical-records', icon: Activity },
-        { name: 'Billing', href: '/billing', icon: FileText },
-        { name: 'Reports', href: '/reports', icon: BarChart3 },
-        { name: 'Settings', href: '/settings', icon: Settings },
-    ];
+    // Icon mapping
+    const iconMap = {
+        '/': LayoutDashboard,
+        '/patients': Users,
+        '/doctors': Stethoscope,
+        '/appointments': Calendar,
+        '/medical-records': Activity,
+        '/prescriptions': Pill,
+        '/billing': FileText,
+        '/reports': BarChart3,
+        '/settings': Settings,
+    };
+
+    // Filter navigation based on user role
+    const navigation = NAV_ITEMS
+        .filter(item => item.roles.includes(userRole))
+        .map(item => ({
+            ...item,
+            icon: iconMap[item.href] || LayoutDashboard
+        }));
 
     return (
         <div className="flex h-screen bg-gray-50 font-sans">

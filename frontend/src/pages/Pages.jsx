@@ -9,3 +9,5 @@ export { default as Billing } from './Billing';
 export { default as SearchPage } from './SearchPage';
 export { default as Login } from './Login';
 export { default as Reports } from './Reports';
+export { default as Settings } from './Settings';
+export { default as Prescriptions } from './Prescriptions';
