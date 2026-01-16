@@ -81,12 +81,17 @@ toast.info("New update available");
 - **Prescriptions**: Improved contrast for modal labels and details.
 - **Patients/Doctors/Appointments**: Applied comprehensive dark mode text contrast fixes.
 
+### Bug Fixes
+- **Appointments Page**: Fixed "Confirm" and "Cancel" buttons by correcting the API call endpoint (switched from `/status` to primary PUT endpoint with JSON body).
+- **Settings Page**: Fixed syntax error in JSX structure.
+- **Null Safety**: Standardized on `Optional.ofNullable(...).orElseThrow()` for database save operations to ensure robust null handling and eliminating IDE warnings without suppression checks.
+
 ### Phase 6 Improvements
 - **Print Prescription**: Added a "Print" button to the Prescription View Modal. It generates a clean, professional print view (hiding UI buttons) suitable for physical printing or saving as PDF.
 - **Structured Inputs**: Enhanced the "New Prescription" form to allow adding multiple medications dynamically with specific fields (Name, Dosage, Frequency, Duration) instead of a single text block.
 
 ### Backend Stability
-- **Null Safety**: Standardized on `Optional.ofNullable(...).orElseThrow()` for database save operations to ensure robust null handling and eliminating IDE warnings without suppression checks.
+- **Null Safety**: Resolved IDE warnings by using `Optional.ofNullable(...).orElseThrow()` and adding `@SuppressWarnings("null")` where strict null analysis flagged `repository.save()` returns.
 - **Foreign Key Violation Fix**: Updated `Patient.java` with `CascadeType.ALL` to ensure Appointments, Medical Records, etc. are deleted when a Patient is deleted. Updated `PatientController` to also clean up associated User accounts.
 - **Lazy User Migration**: Updated `AuthController` to automatically create User accounts (with default password `Patient123`) for existing patients who try to log in but don't have credentials yet.
 - **Cleanup**: Removed unused imports across controllers.

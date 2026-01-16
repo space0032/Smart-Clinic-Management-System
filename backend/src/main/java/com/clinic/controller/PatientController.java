@@ -10,6 +10,7 @@ import org.springframework.lang.NonNull;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/patients")
@@ -37,8 +38,10 @@ public class PatientController {
     }
 
     @PostMapping
+    @SuppressWarnings("null")
     public Patient createPatient(@RequestBody Patient patient) {
-        Patient savedPatient = patientRepository.save(patient);
+        Patient savedPatient = Optional.ofNullable(patientRepository.save(patient))
+                .orElseThrow(() -> new RuntimeException("Failed to save patient"));
 
         // Auto-create User account for Patient
         if (patient.getEmail() != null && !patient.getEmail().isEmpty()) {
@@ -59,6 +62,7 @@ public class PatientController {
     }
 
     @PutMapping("/{id}")
+    @SuppressWarnings("null")
     public ResponseEntity<Patient> updatePatient(@PathVariable @NonNull UUID id, @RequestBody Patient patientDetails) {
         return patientRepository.findById(id)
                 .map(patient -> {
@@ -71,7 +75,9 @@ public class PatientController {
                     patient.setDateOfBirth(patientDetails.getDateOfBirth());
                     patient.setMedicalHistory(patientDetails.getMedicalHistory());
                     patient.setBloodGroup(patientDetails.getBloodGroup());
-                    return ResponseEntity.ok(patientRepository.save(patient));
+                    return ResponseEntity.ok(
+                            Optional.ofNullable(patientRepository.save(patient))
+                                    .orElseThrow(() -> new RuntimeException("Failed to save patient")));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }

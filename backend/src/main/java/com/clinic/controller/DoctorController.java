@@ -8,6 +8,7 @@ import org.springframework.lang.NonNull;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/doctors")
@@ -33,11 +34,14 @@ public class DoctorController {
     }
 
     @PostMapping
+    @SuppressWarnings("null")
     public Doctor createDoctor(@RequestBody Doctor doctor) {
-        return doctorRepository.save(doctor);
+        return Optional.ofNullable(doctorRepository.save(doctor))
+                .orElseThrow(() -> new RuntimeException("Failed to save doctor"));
     }
 
     @PutMapping("/{id}")
+    @SuppressWarnings("null")
     public ResponseEntity<Doctor> updateDoctor(@PathVariable @NonNull UUID id, @RequestBody Doctor doctorDetails) {
         return doctorRepository.findById(id)
                 .map(doctor -> {
@@ -48,7 +52,9 @@ public class DoctorController {
                     doctor.setQualifications(doctorDetails.getQualifications());
                     doctor.setExperience(doctorDetails.getExperience());
                     doctor.setAvailability(doctorDetails.getAvailability());
-                    return ResponseEntity.ok(doctorRepository.save(doctor));
+                    return ResponseEntity.ok(
+                            Optional.ofNullable(doctorRepository.save(doctor))
+                                    .orElseThrow(() -> new RuntimeException("Failed to save doctor")));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
