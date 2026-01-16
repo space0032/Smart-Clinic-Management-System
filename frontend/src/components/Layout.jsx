@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard, Users, Calendar, FileText, Settings, LogOut, Search,
-    Stethoscope, Activity, Menu, X, BarChart3, Pill
+    Stethoscope, Activity, Menu, X, BarChart3, Pill, FlaskConical
 } from 'lucide-react';
 import { getUser, NAV_ITEMS } from '../utils/permissions';
 import { ToastContainer, useToast } from './Toast';
@@ -37,6 +37,7 @@ const Layout = () => {
         '/prescriptions': Pill,
         '/billing': FileText,
         '/reports': BarChart3,
+        '/lab': FlaskConical,
         '/settings': Settings,
     };
 

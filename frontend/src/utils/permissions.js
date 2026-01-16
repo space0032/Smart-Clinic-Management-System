@@ -9,13 +9,13 @@ export const ROLES = {
 export const PERMISSIONS = {
     [ROLES.ADMIN]: [
         '/', '/patients', '/doctors', '/appointments',
-        '/medical-records', '/billing', '/reports', '/settings', '/search'
+        '/medical-records', '/billing', '/reports', '/settings', '/search', '/lab'
     ],
     [ROLES.DOCTOR]: [
-        '/', '/patients', '/appointments', '/medical-records', '/settings', '/search'
+        '/', '/patients', '/appointments', '/medical-records', '/settings', '/search', '/lab'
     ],
     [ROLES.RECEPTIONIST]: [
-        '/', '/patients', '/appointments', '/billing', '/settings', '/search'
+        '/', '/patients', '/appointments', '/billing', '/settings', '/search', '/lab'
     ]
 };
 
@@ -29,6 +29,7 @@ export const NAV_ITEMS = [
     { name: 'Prescriptions', href: '/prescriptions', roles: ['ADMIN', 'DOCTOR'] },
     { name: 'Billing', href: '/billing', roles: ['ADMIN', 'RECEPTIONIST'] },
     { name: 'Reports', href: '/reports', roles: ['ADMIN'] },
+    { name: 'Laboratory', href: '/lab', roles: ['ADMIN', 'DOCTOR', 'RECEPTIONIST'] },
     { name: 'Settings', href: '/settings', roles: ['ADMIN', 'DOCTOR', 'RECEPTIONIST'] },
 ];
 

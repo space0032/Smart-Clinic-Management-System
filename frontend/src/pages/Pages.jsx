@@ -12,3 +12,4 @@ export { default as Reports } from './Reports';
 export { default as Settings } from './Settings';
 export { default as Prescriptions } from './Prescriptions';
 export { default as PatientDashboard } from './PatientDashboard';
+export { default as Laboratory } from './Laboratory';
