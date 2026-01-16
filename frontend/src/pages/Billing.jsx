@@ -184,12 +184,18 @@ export default function Billing() {
                             bills.map(bill => (
                                 <tr key={bill.id} className="hover:bg-gray-50">
                                     <td className="px-6 py-4 font-mono text-xs text-gray-500">#{bill.id.substring(0, 8)}</td>
-                                    <td className="px-6 py-4 font-medium text-gray-900">{bill.patient.name}</td>
-                                    <td className="px-6 py-4 text-gray-600">{new Date(bill.createdAt).toLocaleDateString()}</td>
+                                    <td className="px-6 py-4 font-medium text-gray-900">{bill.patient?.name || 'N/A'}</td>
+                                    <td className="px-6 py-4 text-gray-600">
+                                        {bill.paymentDate
+                                            ? new Date(bill.paymentDate).toLocaleDateString()
+                                            : bill.appointment?.appointmentDate
+                                                ? new Date(bill.appointment.appointmentDate).toLocaleDateString()
+                                                : 'Pending'}
+                                    </td>
                                     <td className="px-6 py-4 font-bold text-gray-900">${bill.amount.toFixed(2)}</td>
                                     <td className="px-6 py-4">
                                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${bill.status === 'PAID' ? 'bg-green-100 text-green-700' :
-                                                bill.status === 'OVERDUE' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
+                                            bill.status === 'OVERDUE' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
                                             }`}>
                                             {bill.status}
                                         </span>

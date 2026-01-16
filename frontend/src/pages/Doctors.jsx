@@ -74,7 +74,7 @@ export default function Doctors() {
                 </div>
                 <button
                     onClick={() => setShowForm(!showForm)}
-                    className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                    className="flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                 >
                     <Plus className="w-5 h-5 mr-2" />
                     Add Doctor
@@ -86,57 +86,57 @@ export default function Doctors() {
                 <input
                     type="text"
                     placeholder="Search doctors by name or specialization..."
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                    className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:outline-none"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
 
             {showForm && (
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                    <h2 className="text-lg font-semibold mb-4">New Doctor Registration</h2>
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <h2 className="text-lg font-semibold mb-4 text-slate-800">New Doctor Registration</h2>
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <input
                             type="text" placeholder="Dr. Full Name" required
-                            className="p-2 border rounded-lg"
+                            className="p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-400"
                             value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })}
                         />
                         <input
                             type="email" placeholder="Email" required
-                            className="p-2 border rounded-lg"
+                            className="p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-400"
                             value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })}
                         />
                         <input
                             type="text" placeholder="Specialization (e.g. Cardiology)" required
-                            className="p-2 border rounded-lg"
+                            className="p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-400"
                             value={formData.specialization} onChange={e => setFormData({ ...formData, specialization: e.target.value })}
                         />
                         <input
                             type="number" placeholder="Experience (Years)"
-                            className="p-2 border rounded-lg"
+                            className="p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-400"
                             value={formData.experienceYears} onChange={e => setFormData({ ...formData, experienceYears: e.target.value })}
                         />
                         <input
                             type="text" placeholder="Contact No"
-                            className="p-2 border rounded-lg"
+                            className="p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-400"
                             value={formData.contactNo} onChange={e => setFormData({ ...formData, contactNo: e.target.value })}
                         />
                         <input
                             type="text" placeholder="Schedule (e.g. Mon-Fri 9-5)"
-                            className="p-2 border rounded-lg"
+                            className="p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-400"
                             value={formData.availabilitySchedule} onChange={e => setFormData({ ...formData, availabilitySchedule: e.target.value })}
                         />
 
                         <div className="md:col-span-2 flex justify-end gap-3 mt-2">
                             <button
                                 type="button" onClick={() => setShowForm(false)}
-                                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                                className="px-4 py-2 text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
-                                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 font-medium"
                             >
                                 Save Doctor
                             </button>
@@ -148,27 +148,27 @@ export default function Doctors() {
             {/* Grid View for Doctors */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {loading ? (
-                    <div className="text-gray-500 col-span-3 text-center">Loading doctors...</div>
+                    <div className="text-slate-500 col-span-3 text-center">Loading doctors...</div>
                 ) : filteredDoctors.length === 0 ? (
-                    <div className="text-gray-500 col-span-3 text-center">No doctors found.</div>
+                    <div className="text-slate-500 col-span-3 text-center">No doctors found.</div>
                 ) : (
                     filteredDoctors.map((doc) => (
-                        <div key={doc.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center text-center hover:shadow-md transition-shadow">
-                            <div className="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mb-4">
-                                <Stethoscope className="w-8 h-8 text-indigo-600" />
+                        <div key={doc.id} className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col items-center text-center hover:shadow-md transition-shadow group">
+                            <div className="w-16 h-16 bg-primary-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-primary-100 transition-colors">
+                                <Stethoscope className="w-8 h-8 text-primary-600" />
                             </div>
-                            <h3 className="text-lg font-bold text-gray-900">{doc.name}</h3>
-                            <span className="inline-block px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium mt-2">
+                            <h3 className="text-lg font-bold text-slate-800">{doc.name}</h3>
+                            <span className="inline-block px-3 py-1 bg-secondary-50 text-secondary-700 rounded-full text-xs font-medium mt-2 border border-secondary-100">
                                 {doc.specialization}
                             </span>
-                            <p className="text-gray-500 text-sm mt-3">{doc.experienceYears} Years Exp.</p>
-                            <p className="text-gray-400 text-xs mt-1">{doc.email}</p>
+                            <p className="text-slate-500 text-sm mt-3">{doc.experienceYears} Years Exp.</p>
+                            <p className="text-slate-400 text-xs mt-1">{doc.email}</p>
 
                             <div className="flex gap-2 mt-6 w-full">
-                                <button className="flex-1 py-2 text-indigo-600 bg-indigo-50 rounded-lg text-sm font-medium hover:bg-indigo-100">
+                                <button className="flex-1 py-2 text-primary-700 bg-primary-50 rounded-lg text-sm font-medium hover:bg-primary-100 transition-colors">
                                     View Profile
                                 </button>
-                                <button onClick={() => handleDelete(doc.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg">
+                                <button onClick={() => handleDelete(doc.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
                                     <Trash2 className="w-4 h-4" />
                                 </button>
                             </div>
