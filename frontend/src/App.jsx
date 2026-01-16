@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
-import { Dashboard, Patients, Doctors, Appointments, MedicalRecords, Billing, Login } from './pages/Pages';
+import { Dashboard, Patients, Doctors, Appointments, MedicalRecords, Billing, SearchPage, Login } from './pages/Pages';
 
 const App = () => {
   return (
@@ -11,6 +11,7 @@ const App = () => {
         {/* Protected Routes */}
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
+          <Route path="search" element={<SearchPage />} />
           <Route path="patients" element={<Patients />} />
           <Route path="doctors" element={<Doctors />} />
           <Route path="appointments" element={<Appointments />} />

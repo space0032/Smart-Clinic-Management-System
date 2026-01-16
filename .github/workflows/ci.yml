@@ -25,8 +25,8 @@ jobs:
         cache: maven
 
     - name: Build Backend with Maven
-      run: ./mvnw clean package -DskipTests
-      # Skipping tests because we haven't set up a test database in CI environment yet
+      run: mvn clean package -DskipTests
+      # Using 'mvn' directly as the wrapper might be missing in the repo
 
   build-frontend:
     runs-on: ubuntu-latest

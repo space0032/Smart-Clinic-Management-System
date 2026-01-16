@@ -1,8 +1,18 @@
-import { Link, Outlet, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, Calendar, FileText, Settings, LogOut } from 'lucide-react';
+import { useState } from 'react';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, Users, Calendar, FileText, Settings, LogOut, Search } from 'lucide-react';
 
 const Layout = () => {
     const location = useLocation();
+    const navigate = useNavigate();
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        if (searchTerm.trim()) {
+            navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
+        }
+    };
 
     const navigation = [
         { name: 'Dashboard', href: '/', icon: LayoutDashboard },
@@ -54,6 +64,19 @@ const Layout = () => {
                     <h1 className="text-lg font-semibold text-gray-800">
                         {navigation.find(n => n.href === location.pathname)?.name || 'Portal'}
                     </h1>
+
+                    {/* Search Bar */}
+                    <form onSubmit={handleSearch} className="flex-1 max-w-md mx-8 relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <input
+                            type="text"
+                            placeholder="Global Search (Patients, Doctors)..."
+                            className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </form>
+
                     <div className="flex items-center space-x-4">
                         <span className="text-sm text-gray-500">Welcome, Dr. Smith</span>
                         <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
