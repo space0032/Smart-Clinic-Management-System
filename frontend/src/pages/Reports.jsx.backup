@@ -25,7 +25,7 @@ export default function Reports() {
     };
 
     if (loading) {
-        return <div className="flex items-center justify-center h-64 text-slate-500 dark:text-slate-400">Loading analytics...</div>;
+        return <div className="flex items-center justify-center h-64 text-slate-500">Loading analytics...</div>;
     }
 
     if (!analytics) {
@@ -44,8 +44,8 @@ export default function Reports() {
             {/* Header */}
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Reports & Analytics</h1>
-                    <p className="text-slate-500 dark:text-slate-400">Comprehensive clinic performance insights</p>
+                    <h1 className="text-2xl font-bold text-slate-800">Reports & Analytics</h1>
+                    <p className="text-slate-500">Comprehensive clinic performance insights</p>
                 </div>
                 <button className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
                     <Download className="w-4 h-4" />
@@ -58,11 +58,11 @@ export default function Reports() {
                 {statCards.map((stat, i) => {
                     const Icon = stat.icon;
                     return (
-                        <div key={i} className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+                        <div key={i} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-slate-500 dark:text-slate-400">{stat.title}</p>
-                                    <p className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">{stat.value}</p>
+                                    <p className="text-sm text-slate-500">{stat.title}</p>
+                                    <p className="text-2xl font-bold text-slate-800 mt-1">{stat.value}</p>
                                 </div>
                                 <div className={`${stat.color} p-3 rounded-xl`}>
                                     <Icon className="w-6 h-6 text-white" />
@@ -75,10 +75,10 @@ export default function Reports() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Monthly Revenue Chart */}
-                <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                     <div className="flex items-center gap-2 mb-6">
                         <BarChart3 className="w-5 h-5 text-primary-600" />
-                        <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Monthly Revenue</h3>
+                        <h3 className="text-lg font-bold text-slate-800">Monthly Revenue</h3>
                     </div>
                     <div className="h-64 flex items-end justify-between gap-2">
                         {analytics.monthlyRevenue?.map((month, i) => {
@@ -90,8 +90,8 @@ export default function Reports() {
                                         className="w-full bg-gradient-to-t from-primary-600 to-primary-400 rounded-t-lg transition-all hover:from-primary-700 hover:to-primary-500"
                                         style={{ height: `${Math.max(height, 5)}%` }}
                                     ></div>
-                                    <span className="text-xs text-slate-500 dark:text-slate-400">{month.month}</span>
-                                    <span className="text-xs font-medium text-slate-700 dark:text-slate-200">${Number(month.revenue).toLocaleString()}</span>
+                                    <span className="text-xs text-slate-500">{month.month}</span>
+                                    <span className="text-xs font-medium text-slate-700">${Number(month.revenue).toLocaleString()}</span>
                                 </div>
                             );
                         })}
@@ -99,10 +99,10 @@ export default function Reports() {
                 </div>
 
                 {/* Appointment Status Breakdown */}
-                <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                     <div className="flex items-center gap-2 mb-6">
                         <PieChart className="w-5 h-5 text-secondary-600" />
-                        <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Appointment Status</h3>
+                        <h3 className="text-lg font-bold text-slate-800">Appointment Status</h3>
                     </div>
                     <div className="space-y-4">
                         {Object.entries(analytics.appointmentsByStatus || {}).map(([status, count]) => {
@@ -117,10 +117,10 @@ export default function Reports() {
                             return (
                                 <div key={status}>
                                     <div className="flex justify-between text-sm mb-1">
-                                        <span className="text-slate-600 dark:text-slate-300">{status}</span>
-                                        <span className="font-medium text-slate-800 dark:text-slate-100">{count} ({percentage}%)</span>
+                                        <span className="text-slate-600">{status}</span>
+                                        <span className="font-medium text-slate-800">{count} ({percentage}%)</span>
                                     </div>
-                                    <div className="h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                                    <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                                         <div
                                             className={`h-full ${colors[status] || 'bg-slate-500'} rounded-full`}
                                             style={{ width: `${percentage}%` }}
@@ -133,24 +133,24 @@ export default function Reports() {
                 </div>
 
                 {/* Appointments by Doctor */}
-                <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                     <div className="flex items-center gap-2 mb-6">
                         <Activity className="w-5 h-5 text-purple-600" />
-                        <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Top Doctors</h3>
+                        <h3 className="text-lg font-bold text-slate-800">Top Doctors</h3>
                     </div>
                     <div className="space-y-3">
                         {Object.entries(analytics.appointmentsByDoctor || {})
                             .sort(([, a], [, b]) => b - a)
                             .slice(0, 5)
                             .map(([doctor, count], i) => (
-                                <div key={doctor} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700 rounded-xl">
+                                <div key={doctor} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
                                     <div className="flex items-center gap-3">
                                         <span className="w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm font-bold">
                                             {i + 1}
                                         </span>
-                                        <span className="font-medium text-slate-700 dark:text-slate-200">{doctor}</span>
+                                        <span className="font-medium text-slate-700">{doctor}</span>
                                     </div>
-                                    <span className="text-sm text-slate-500 dark:text-slate-400">{count} appointments</span>
+                                    <span className="text-sm text-slate-500">{count} appointments</span>
                                 </div>
                             ))}
                         {Object.keys(analytics.appointmentsByDoctor || {}).length === 0 && (
@@ -160,10 +160,10 @@ export default function Reports() {
                 </div>
 
                 {/* Appointments by Day of Week */}
-                <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                     <div className="flex items-center gap-2 mb-6">
                         <Calendar className="w-5 h-5 text-green-600" />
-                        <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Busiest Days</h3>
+                        <h3 className="text-lg font-bold text-slate-800">Busiest Days</h3>
                     </div>
                     <div className="grid grid-cols-7 gap-2">
                         {['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'].map((day) => {
@@ -186,7 +186,7 @@ export default function Reports() {
                                             {count}
                                         </span>
                                     </div>
-                                    <span className="text-xs text-slate-500 dark:text-slate-400">{day}</span>
+                                    <span className="text-xs text-slate-500">{day}</span>
                                 </div>
                             );
                         })}

@@ -83,26 +83,27 @@ export default function Login() {
                     </div>
                 </div>
 
+
                 <div className="relative z-10 text-white/50 text-sm">
                     © 2026 MediCare. All rights reserved.
                 </div>
             </div>
 
             {/* Right Side - Form */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-slate-50">
+            <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-slate-50 dark:bg-slate-900">
                 <div className="w-full max-w-md">
                     <div className="lg:hidden flex items-center justify-center gap-3 mb-8">
                         <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center">
                             <Activity className="w-6 h-6 text-white" />
                         </div>
-                        <span className="text-xl font-bold text-slate-800">MediCare</span>
+                        <span className="text-xl font-bold text-slate-800 dark:text-slate-100">MediCare</span>
                     </div>
 
                     <div className="text-center mb-8">
-                        <h2 className="text-3xl font-bold text-slate-800">
+                        <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-100">
                             {isRegister ? 'Create Account' : 'Welcome back'}
                         </h2>
-                        <p className="text-slate-500 mt-2">
+                        <p className="text-slate-500 dark:text-slate-400 mt-2">
                             {isRegister ? 'Register to access the clinic portal' : 'Sign in to access your dashboard'}
                         </p>
                     </div>
@@ -110,15 +111,15 @@ export default function Login() {
                     <form onSubmit={handleSubmit} className="space-y-4">
                         {isRegister && (
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Full Name</label>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">Full Name</label>
                                 <div className="relative">
-                                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
                                     <input
                                         type="text"
                                         value={formData.name}
                                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                         required={isRegister}
-                                        className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all"
+                                        className="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-slate-800 dark:text-slate-100"
                                         placeholder="Dr. John Smith"
                                     />
                                 </div>
@@ -126,30 +127,30 @@ export default function Login() {
                         )}
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">Email Address</label>
                             <div className="relative">
-                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
                                 <input
                                     type="email"
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                     required
-                                    className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all"
+                                    className="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-slate-800 dark:text-slate-100"
                                     placeholder="doctor@clinic.com"
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Password</label>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">Password</label>
                             <div className="relative">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
                                 <input
                                     type="password"
                                     value={formData.password}
                                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                     required
-                                    className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all"
+                                    className="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-slate-800 dark:text-slate-100"
                                     placeholder="••••••••"
                                 />
                             </div>
@@ -157,11 +158,11 @@ export default function Login() {
 
                         {isRegister && (
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Role</label>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">Role</label>
                                 <select
                                     value={formData.role}
                                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                                    className="w-full px-4 py-3.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none"
+                                    className="w-full px-4 py-3.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none text-slate-800 dark:text-slate-100"
                                 >
                                     <option value="ADMIN">Admin</option>
                                     <option value="DOCTOR">Doctor</option>
@@ -172,8 +173,8 @@ export default function Login() {
 
                         {message && (
                             <div className={`p-4 rounded-xl text-sm ${message.startsWith('Error')
-                                    ? 'bg-red-50 text-red-600 border border-red-100'
-                                    : 'bg-green-50 text-green-600 border border-green-100'
+                                ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-800'
+                                : 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border border-green-100 dark:border-green-800'
                                 }`}>
                                 {message}
                             </div>
@@ -198,13 +199,13 @@ export default function Login() {
                     <div className="mt-6 text-center">
                         <button
                             onClick={() => { setIsRegister(!isRegister); setMessage(''); }}
-                            className="text-primary-600 hover:text-primary-700 font-medium text-sm"
+                            className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium text-sm"
                         >
                             {isRegister ? 'Already have an account? Sign In' : "Don't have an account? Register"}
                         </button>
                     </div>
 
-                    <div className="mt-8 text-center text-xs text-slate-400">
+                    <div className="mt-8 text-center text-xs text-slate-400 dark:text-slate-500">
                         Smart Clinic Management System v1.0
                     </div>
                 </div>

@@ -49,10 +49,10 @@ const Layout = () => {
         }));
 
     return (
-        <div className="flex h-screen bg-gray-50 font-sans">
+        <div className="flex h-screen bg-gray-50 dark:bg-slate-900 font-sans">
             {/* Sidebar */}
             <aside
-                className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-sidebar text-white transition-all duration-300 ease-in-out flex flex-col shadow-xl z-20`}
+                className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-sidebar dark:bg-slate-950 text-white transition-all duration-300 ease-in-out flex flex-col shadow-xl z-20`}
             >
                 {/* Logo Area */}
                 <div className="h-16 flex items-center justify-center border-b border-white/10 relative">
@@ -114,43 +114,45 @@ const Layout = () => {
             </aside>
 
             {/* Main Content Area */}
-            <div className="flex-1 flex flex-col overflow-hidden bg-gray-50/50">
+            <div className="flex-1 flex flex-col overflow-hidden">
                 {/* Header */}
-                <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm">
+                <header className="h-16 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between px-6 shadow-sm z-10">
                     <div className="flex flex-col">
-                        <h1 className="text-lg font-bold text-slate-800">
+                        <h1 className="text-lg font-bold text-slate-800 dark:text-slate-100">
                             {navigation.find(n => n.href === location.pathname)?.name || 'Portal'}
                         </h1>
                         <p className="text-xs text-slate-500">Overview of clinic operations</p>
                     </div>
 
                     {/* Search Bar */}
-                    <form onSubmit={handleSearch} className="flex-1 max-w-lg mx-12 relative group">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-primary-500 transition-colors" />
+                    <form
+                        className="flex-1 max-w-md relative"
+                        onSubmit={handleSearch}
+                    >
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
                         <input
                             type="text"
-                            placeholder="Search patients, doctors, records..."
-                            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all text-sm placeholder:text-slate-400"
+                            placeholder="Search patients, doctors..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                         />
                     </form>
 
                     {/* User Profile */}
-                    <div className="flex items-center gap-4 pl-4 border-l border-gray-200">
-                        <div className="text-right hidden md:block">
-                            <p className="text-sm font-semibold text-slate-800">Dr. Sarah Smith</p>
-                            <p className="text-xs text-primary-600 font-medium">Chief Physician</p>
+                    <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-primary-500 to-secondary-500 flex items-center justify-center text-white font-semibold text-sm">
+                            {user?.name?.charAt(0)?.toUpperCase() || 'A'}
                         </div>
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary-500 to-secondary-500 p-0.5 cursor-pointer hover:shadow-lg transition-shadow">
-                            <div className="w-full h-full bg-white rounded-full flex items-center justify-center text-primary-700 font-bold text-sm">
-                                SS
-                            </div>
+                        <div className="hidden md:block">
+                            <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{user?.name || 'Admin'}</p>
+                            <p className="text-xs text-slate-400 dark:text-slate-500">{user?.role || 'Administrator'}</p>
                         </div>
                     </div>
                 </header>
 
-                <main className="flex-1 overflow-auto p-8 relative">
+                {/* Main Content */}
+                <main className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-slate-900">
                     <div className="max-w-7xl mx-auto">
                         <Outlet />
                     </div>

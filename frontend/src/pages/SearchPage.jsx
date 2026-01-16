@@ -27,33 +27,41 @@ export default function SearchPage() {
         }
     };
 
-    if (!query) return <div className="p-8 text-center text-gray-500">Please enter a search term.</div>;
+    const handleSearchInputChange = (e) => {
+        setSearchTerm(e.target.value);
+    };
+
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        if (searchTerm.trim()) {
+            setSearchParams({ q: searchTerm.trim() });
+        } else {
+            setSearchParams({}); // Clear search param if input is empty
+        }
+    };
 
     return (
-        <div className="space-y-8">
-            <h1 className="text-2xl font-bold text-gray-800">Search Results for "{query}"</h1>
+        <div className="p-8 space-y-8 bg-white dark:bg-slate-900 min-h-screen text-gray-900 dark:text-slate-100">
+            <div className="space-y-2">
+                <h1 className="text-2xl font-bold text-gray-800 dark:text-slate-100">Global Search</h1>
+                <p className="text-gray-500 dark:text-slate-400">Search across patients, doctors, and appointments</p>
+            </div>
 
-            {loading ? (
-                <div className="text-gray-500">Searching...</div>
+            <form onSubmit={handleSearchSubmit} className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-slate-500 w-5 h-5" />
+                <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchTerm}
+                    onChange={handleSearchInputChange}
+                    className="w-full pl-10 pr-4 py-2 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:outline-none bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                />
+            </form>
+
+            {!query ? (
+                <div className="p-8 text-center text-gray-500 dark:text-slate-400">Please enter a search term.</div>
             ) : (
                 <>
-                    {/* Patients Section */}
-                    <section>
-                        <h2 className="text-lg font-semibold text-gray-700 mb-4 flex items-center">
-                            <User className="w-5 h-5 mr-2" /> Patients ({results.patients.length})
-                        </h2>
-                        {results.patients.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {results.patients.map(p => (
-                                    <div key={p.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-                                        <h3 className="font-bold text-gray-900">{p.name}</h3>
-                                        <p className="text-sm text-gray-500">{p.contactNo}</p>
-                                        <p className="text-xs text-gray-400 mt-1">{p.email}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : <p className="text-gray-400 italic">No patients found.</p>}
-                    </section>
 
                     {/* Doctors Section */}
                     <section>
@@ -66,7 +74,7 @@ export default function SearchPage() {
                                 <h3 className="text-sm font-medium text-gray-500 mb-2 uppercase tracking-wide">By Name</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     {results.doctors.map(d => (
-                                        <div key={d.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex justify-between items-center">
+                                        <div key={d.id} className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-slate-700 flex justify-between items-center">
                                             <div>
                                                 <h3 className="font-bold text-gray-900">{d.name}</h3>
                                                 <span className="text-xs bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded">{d.specialization}</span>
@@ -82,7 +90,7 @@ export default function SearchPage() {
                                 <h3 className="text-sm font-medium text-gray-500 mb-2 uppercase tracking-wide">By Specialization</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     {results.specialists.map(d => (
-                                        <div key={'spec-' + d.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex justify-between items-center">
+                                        <div key={'spec-' + d.id} className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-slate-700 flex justify-between items-center">
                                             <div>
                                                 <h3 className="font-bold text-gray-900">{d.name}</h3>
                                                 <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded">{d.specialization}</span>

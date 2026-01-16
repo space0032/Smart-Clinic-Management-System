@@ -71,7 +71,7 @@ export default function Dashboard() {
     ];
 
     if (loading) {
-        return <div className="text-center text-slate-500 py-12">Loading dashboard...</div>;
+        return <div className="text-center text-slate-500 dark:text-slate-400 py-12">Loading dashboard...</div>;
     }
 
     return (
@@ -97,11 +97,11 @@ export default function Dashboard() {
                 {statCards.map((stat, index) => {
                     const Icon = stat.icon;
                     return (
-                        <div key={index} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                        <div key={index} className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md transition-shadow">
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <p className="text-sm font-medium text-slate-500">{stat.title}</p>
-                                    <h3 className="text-2xl font-bold text-slate-800 mt-2">{stat.value}</h3>
+                                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{stat.title}</p>
+                                    <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-2">{stat.value}</h3>
                                 </div>
                                 <div className={`p-3 rounded-xl ${stat.bg}`}>
                                     <Icon className={`w-6 h-6 ${stat.color}`} />
@@ -109,7 +109,7 @@ export default function Dashboard() {
                             </div>
                             {stat.change && (
                                 <div className="mt-4 flex items-center text-sm">
-                                    <span className="font-medium text-slate-600">{stat.change}</span>
+                                    <span className="font-medium text-slate-600 dark:text-slate-300">{stat.change}</span>
                                 </div>
                             )}
                         </div>
@@ -119,15 +119,15 @@ export default function Dashboard() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Recent Appointments */}
-                <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                <div className="lg:col-span-2 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-6">
                     <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-lg font-bold text-slate-800">Recent Appointments</h3>
-                        <a href="/appointments" className="text-sm text-primary-600 font-medium hover:text-primary-700">View All</a>
+                        <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Recent Appointments</h3>
+                        <a href="/appointments" className="text-sm text-primary-600 dark:text-primary-400 font-medium hover:text-primary-700 dark:hover:text-primary-300">View All</a>
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
-                                <tr className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                <tr className="text-left text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                                     <th className="pb-4">Patient</th>
                                     <th className="pb-4">Doctor</th>
                                     <th className="pb-4">Date</th>
@@ -137,14 +137,14 @@ export default function Dashboard() {
                             <tbody className="space-y-4">
                                 {recentAppointments.length === 0 ? (
                                     <tr>
-                                        <td colSpan="4" className="py-4 text-center text-slate-400">No appointments yet</td>
+                                        <td colSpan="4" className="py-4 text-center text-slate-400 dark:text-slate-500">No appointments yet</td>
                                     </tr>
                                 ) : (
                                     recentAppointments.map((appt, i) => (
-                                        <tr key={i} className="border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition-colors">
-                                            <td className="py-3 font-medium text-slate-700">{appt.patient?.name || 'N/A'}</td>
-                                            <td className="py-3 text-slate-500 text-sm">{appt.doctor?.name || 'N/A'}</td>
-                                            <td className="py-3 text-slate-500 text-sm">
+                                        <tr key={i} className="border-b border-slate-50 dark:border-slate-700 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+                                            <td className="py-3 font-medium text-slate-700 dark:text-slate-200">{appt.patient?.name || 'N/A'}</td>
+                                            <td className="py-3 text-slate-500 dark:text-slate-400 text-sm">{appt.doctor?.name || 'N/A'}</td>
+                                            <td className="py-3 text-slate-500 dark:text-slate-400 text-sm">
                                                 {appt.appointmentDate ? new Date(appt.appointmentDate).toLocaleDateString() : 'N/A'}
                                             </td>
                                             <td className="py-3">
