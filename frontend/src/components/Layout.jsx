@@ -5,12 +5,16 @@ import {
     Stethoscope, Activity, Menu, X, BarChart3, Pill
 } from 'lucide-react';
 import { getUser, NAV_ITEMS } from '../utils/permissions';
+import { ToastContainer, useToast } from './Toast';
 
 const Layout = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [sidebarOpen, setSidebarOpen] = useState(true);
+
+    // Toast notifications
+    const toast = useToast();
 
     // Get current user and filter navigation by role
     const user = getUser();
@@ -152,6 +156,9 @@ const Layout = () => {
                     </div>
                 </main>
             </div>
+
+            {/* Toast Container */}
+            <ToastContainer toasts={toast.toasts} removeToast={toast.removeToast} />
         </div>
     );
 };
