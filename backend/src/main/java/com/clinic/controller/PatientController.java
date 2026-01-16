@@ -10,7 +10,6 @@ import org.springframework.lang.NonNull;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/patients")
@@ -39,15 +38,12 @@ public class PatientController {
 
     @PostMapping
     public Patient createPatient(@RequestBody Patient patient) {
-        Patient savedPatient = Optional.ofNullable(patientRepository.save(patient))
-                .orElseThrow(() -> new RuntimeException("Failed to save patient"));
+        Patient savedPatient = patientRepository.save(patient);
 
         // Auto-create User account for Patient
         if (patient.getEmail() != null && !patient.getEmail().isEmpty()) {
             try {
                 // Check if user already exists
-                // Note: In real app, handle duplicate email gracefully.
-                // Here we just attempt create.
                 User newUser = new User();
                 newUser.setEmail(patient.getEmail());
                 newUser.setName(patient.getName());
@@ -55,8 +51,6 @@ public class PatientController {
                 newUser.setRole("PATIENT");
                 userRepository.save(newUser);
             } catch (Exception e) {
-                // Log error but don't fail patient creation?
-                // Or maybe we should? For now, we print stack trace.
                 System.err.println("Failed to create user account for patient: " + e.getMessage());
             }
         }
@@ -77,9 +71,7 @@ public class PatientController {
                     patient.setDateOfBirth(patientDetails.getDateOfBirth());
                     patient.setMedicalHistory(patientDetails.getMedicalHistory());
                     patient.setBloodGroup(patientDetails.getBloodGroup());
-                    return ResponseEntity.ok(
-                            Optional.ofNullable(patientRepository.save(patient))
-                                    .orElseThrow(() -> new RuntimeException("Failed to save patient")));
+                    return ResponseEntity.ok(patientRepository.save(patient));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -89,15 +81,15 @@ public class PatientController {
         return patientRepository.findById(id).map(patient -> {
             // Delete associated User account if exists
             if (patient.getEmail() != null) {
-                userRepository.findByEmail(patient.getEmail())
-                        .ifPresent(user -> {
-                            try {
-                                userRepository.delete(user);
-                            } catch (Exception e) {
-                                System.err.println(
-                                        "Warning: Failed to delete associated user account: " + e.getMessage());
-                            }
-                        });
+                User user = userRepository.findByEmail(patient.getEmail()).orElse(null);
+                if (user != null) {
+                    try {
+                        userRepository.delete(user);
+                    } catch (Exception e) {
+                        System.err.println(
+                                "Warning: Failed to delete associated user account: " + e.getMessage());
+                    }
+                }
             }
 
             // Delete patient (Cascades to Appointments, MedicalRecords, etc.)

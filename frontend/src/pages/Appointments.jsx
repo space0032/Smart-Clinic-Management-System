@@ -76,7 +76,7 @@ export default function Appointments() {
 
     const handleStatusUpdate = async (id, status) => {
         try {
-            await axios.put(`${API_URL}/${id}/status?status=${status}`);
+            await axios.put(`${API_URL}/${id}`, { status: status });
             fetchData();
         } catch (error) {
             console.error("Error updating status:", error);
