@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class SmartClinicApplication {
 
 	public static void main(String[] args) {
-		System.setProperty("spring.classformat.ignore", "true");
 		SpringApplication.run(SmartClinicApplication.class, args);
 	}
 
