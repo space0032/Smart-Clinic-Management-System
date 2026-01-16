@@ -6,7 +6,10 @@ import java.util.UUID;
 import java.util.Objects;
 
 @Entity
-@Table(name = "patients")
+@Table(name = "patients", indexes = {
+        @Index(name = "idx_patient_email", columnList = "email"),
+        @Index(name = "idx_patient_name", columnList = "name")
+})
 public class Patient {
 
     @Id
