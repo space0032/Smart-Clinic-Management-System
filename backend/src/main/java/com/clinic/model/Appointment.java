@@ -1,8 +1,9 @@
 package com.clinic.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.UUID;
 import java.util.Objects;
 
 @Entity
@@ -11,7 +12,7 @@ public class Appointment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "patient_id", nullable = false)
@@ -21,11 +22,14 @@ public class Appointment {
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
 
-    @Column(name = "appointment_date", nullable = false)
-    private LocalDateTime appointmentDate;
+    @NotNull(message = "Appointment time is required")
+    @Future(message = "Appointment time must be in the future")
+    @Column(nullable = false)
+    private LocalDateTime appointmentTime;
 
     @Enumerated(EnumType.STRING)
-    private AppointmentStatus status;
+    @Column(nullable = false)
+    private AppointmentStatus status = AppointmentStatus.SCHEDULED;
 
     @Column(columnDefinition = "TEXT")
     private String notes;
@@ -34,24 +38,16 @@ public class Appointment {
         SCHEDULED, CONFIRMED, COMPLETED, CANCELLED
     }
 
+    // Default Constructor
     public Appointment() {
     }
 
-    public Appointment(UUID id, Patient patient, Doctor doctor, LocalDateTime appointmentDate, AppointmentStatus status,
-            String notes) {
-        this.id = id;
-        this.patient = patient;
-        this.doctor = doctor;
-        this.appointmentDate = appointmentDate;
-        this.status = status;
-        this.notes = notes;
-    }
-
-    public UUID getId() {
+    // Getters and Setters
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -71,12 +67,21 @@ public class Appointment {
         this.doctor = doctor;
     }
 
+    public LocalDateTime getAppointmentTime() {
+        return appointmentTime;
+    }
+
+    public void setAppointmentTime(LocalDateTime appointmentTime) {
+        this.appointmentTime = appointmentTime;
+    }
+
+    // Alias for backward compatibility
     public LocalDateTime getAppointmentDate() {
-        return appointmentDate;
+        return appointmentTime;
     }
 
     public void setAppointmentDate(LocalDateTime appointmentDate) {
-        this.appointmentDate = appointmentDate;
+        this.appointmentTime = appointmentDate;
     }
 
     public AppointmentStatus getStatus() {
@@ -108,14 +113,5 @@ public class Appointment {
     @Override
     public int hashCode() {
         return Objects.hash(id);
-    }
-
-    @Override
-    public String toString() {
-        return "Appointment{" +
-                "id=" + id +
-                ", appointmentDate=" + appointmentDate +
-                ", status=" + status +
-                '}';
     }
 }

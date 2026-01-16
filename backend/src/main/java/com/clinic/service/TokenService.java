@@ -1,76 +1,97 @@
 package com.clinic.service;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.security.SecureRandom;
-import java.time.Instant;
-import java.util.Base64;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 
 @Service
 public class TokenService {
 
-    private final Map<String, TokenInfo> tokens = new ConcurrentHashMap<>();
-    private final SecureRandom secureRandom = new SecureRandom();
-    private final Base64.Encoder base64Encoder = Base64.getUrlEncoder().withoutPadding();
+    @Value("${jwt.secret:MySecretKeyForJWTTokenGeneration123456789}")
+    private String jwtSecret;
 
-    // Token expiration time in seconds (24 hours)
-    private static final long TOKEN_EXPIRATION_SECONDS = 86400;
+    // Token expiration time: 24 hours in milliseconds
+    private static final long TOKEN_EXPIRATION_MS = 86400000;
 
-    public String generateToken(UUID userId, String role) {
-        byte[] randomBytes = new byte[32];
-        secureRandom.nextBytes(randomBytes);
-        String token = base64Encoder.encodeToString(randomBytes);
-
-        TokenInfo tokenInfo = new TokenInfo(userId, role, Instant.now().plusSeconds(TOKEN_EXPIRATION_SECONDS));
-        tokens.put(token, tokenInfo);
-
-        return token;
+    /**
+     * Generate a signing key using the configured secret
+     * 
+     * @return SecretKey for JWT signing
+     */
+    public SecretKey getSigningKey() {
+        byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
+    /**
+     * Generate a JWT token using the user's email
+     * 
+     * @param email User's email address
+     * @return JWT token string
+     */
+    public String generateToken(String email) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + TOKEN_EXPIRATION_MS);
+
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    /**
+     * Validate a JWT token
+     * 
+     * @param token JWT token to validate
+     * @return true if token is valid, false otherwise
+     */
     public boolean validateToken(String token) {
-        TokenInfo info = tokens.get(token);
-        if (info == null) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
             return false;
         }
-        if (Instant.now().isAfter(info.expiresAt())) {
-            tokens.remove(token);
-            return false;
-        }
-        return true;
     }
 
-    public UUID getUserIdFromToken(String token) {
-        TokenInfo info = tokens.get(token);
-        return info != null ? info.userId() : null;
+    /**
+     * Get email from JWT token
+     * 
+     * @param token JWT token
+     * @return email address from token
+     */
+    public String getEmailFromToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 
-    public String getRoleFromToken(String token) {
-        TokenInfo info = tokens.get(token);
-        return info != null ? info.role() : null;
-    }
-
-    public void revokeToken(String token) {
-        tokens.remove(token);
-    }
-
-    public void revokeAllUserTokens(UUID userId) {
-        tokens.entrySet().removeIf(entry -> entry.getValue().userId().equals(userId));
-    }
-
-    public String refreshToken(String oldToken) {
-        TokenInfo info = tokens.get(oldToken);
-        if (info == null || Instant.now().isAfter(info.expiresAt())) {
-            return null;
-        }
-
-        tokens.remove(oldToken);
-        return generateToken(info.userId(), info.role());
-    }
-
-    // Token info record
-    private record TokenInfo(UUID userId, String role, Instant expiresAt) {
+    /**
+     * Get expiration date from token
+     * 
+     * @param token JWT token
+     * @return expiration date
+     */
+    public Date getExpirationFromToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getExpiration();
     }
 }

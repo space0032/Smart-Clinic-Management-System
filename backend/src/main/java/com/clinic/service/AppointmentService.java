@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class AppointmentService {
@@ -32,25 +31,25 @@ public class AppointmentService {
         return appointmentRepository.findAll();
     }
 
-    public Optional<Appointment> getAppointmentById(UUID id) {
+    public Optional<Appointment> getAppointmentById(Long id) {
         return appointmentRepository.findById(id);
     }
 
-    public List<Appointment> getAppointmentsByPatient(UUID patientId) {
+    public List<Appointment> getAppointmentsByPatient(Long patientId) {
         return appointmentRepository.findByPatientId(patientId);
     }
 
-    public List<Appointment> getAppointmentsByDoctor(UUID doctorId) {
+    public List<Appointment> getAppointmentsByDoctor(Long doctorId) {
         return appointmentRepository.findByDoctorId(doctorId);
     }
 
     public List<Appointment> getAppointmentsByDate(LocalDateTime date) {
         LocalDateTime start = date.toLocalDate().atStartOfDay();
         LocalDateTime end = start.plusDays(1);
-        return appointmentRepository.findByAppointmentDateBetween(start, end);
+        return appointmentRepository.findByAppointmentTimeBetween(start, end);
     }
 
-    public Appointment createAppointment(UUID patientId, UUID doctorId, LocalDateTime appointmentDate, String notes) {
+    public Appointment createAppointment(Long patientId, Long doctorId, LocalDateTime appointmentTime, String notes) {
         Patient patient = patientRepository.findById(patientId)
                 .orElseThrow(() -> new RuntimeException("Patient not found"));
         Doctor doctor = doctorRepository.findById(doctorId)
@@ -59,42 +58,42 @@ public class AppointmentService {
         Appointment appointment = new Appointment();
         appointment.setPatient(patient);
         appointment.setDoctor(doctor);
-        appointment.setAppointmentDate(appointmentDate);
+        appointment.setAppointmentTime(appointmentTime);
         appointment.setStatus(Appointment.AppointmentStatus.SCHEDULED);
         appointment.setNotes(notes);
 
         return appointmentRepository.save(appointment);
     }
 
-    public Appointment updateAppointmentStatus(UUID id, Appointment.AppointmentStatus status) {
+    public Appointment updateAppointmentStatus(Long id, Appointment.AppointmentStatus status) {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
         appointment.setStatus(status);
         return appointmentRepository.save(appointment);
     }
 
-    public Appointment rescheduleAppointment(UUID id, LocalDateTime newDate) {
+    public Appointment rescheduleAppointment(Long id, LocalDateTime newTime) {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
-        appointment.setAppointmentDate(newDate);
+        appointment.setAppointmentTime(newTime);
         return appointmentRepository.save(appointment);
     }
 
-    public void cancelAppointment(UUID id) {
+    public void cancelAppointment(Long id) {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
         appointment.setStatus(Appointment.AppointmentStatus.CANCELLED);
         appointmentRepository.save(appointment);
     }
 
-    public void deleteAppointment(UUID id) {
+    public void deleteAppointment(Long id) {
         appointmentRepository.deleteById(id);
     }
 
     public long getTodayAppointmentCount() {
         LocalDateTime start = LocalDateTime.now().toLocalDate().atStartOfDay();
         LocalDateTime end = start.plusDays(1);
-        return appointmentRepository.findByAppointmentDateBetween(start, end).size();
+        return appointmentRepository.findByAppointmentTimeBetween(start, end).size();
     }
 
     public long getPendingAppointmentCount() {

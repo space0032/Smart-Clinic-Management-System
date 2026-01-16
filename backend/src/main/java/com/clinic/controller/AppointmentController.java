@@ -9,9 +9,8 @@ import com.clinic.repository.PatientRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/appointments")
@@ -35,58 +34,77 @@ public class AppointmentController {
         return appointmentRepository.findAll();
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Appointment> getAppointmentById(@PathVariable Long id) {
+        return appointmentRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/patient/{patientId}")
+    public List<Appointment> getAppointmentsByPatient(@PathVariable Long patientId) {
+        return appointmentRepository.findByPatientId(patientId);
+    }
+
     @GetMapping("/doctor/{doctorId}")
-    public List<Appointment> getAppointmentsByDoctor(@PathVariable UUID doctorId) {
-        // Ideally we should add a method in Repository: findByDoctorId
-        // For now, filtering manually or assuming the repository will be updated.
-        // Let's rely on basic findAll filtering for simplicity in this step,
-        // OR better, let's just return all for the prototype and filter in frontend
-        // until we add Custom Repository methods.
-        return appointmentRepository.findAll();
+    public List<Appointment> getAppointmentsByDoctor(@PathVariable Long doctorId) {
+        return appointmentRepository.findByDoctorId(doctorId);
     }
 
     @PostMapping
     public ResponseEntity<Appointment> createAppointment(@RequestBody AppointmentRequest request) {
-        // Validate existence
-        Patient patient = patientRepository.findById(request.patientId)
-                .orElseThrow(() -> new RuntimeException("Patient not found"));
-        Doctor doctor = doctorRepository.findById(request.doctorId)
-                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+        Patient patient = patientRepository.findById(request.patientId).orElse(null);
+        Doctor doctor = doctorRepository.findById(request.doctorId).orElse(null);
+
+        if (patient == null || doctor == null) {
+            return ResponseEntity.badRequest().build();
+        }
 
         Appointment appointment = new Appointment();
         appointment.setPatient(patient);
         appointment.setDoctor(doctor);
-        appointment.setAppointmentDate(request.appointmentDate);
+        appointment.setAppointmentTime(request.appointmentDate);
         appointment.setStatus(Appointment.AppointmentStatus.SCHEDULED);
         appointment.setNotes(request.notes);
 
         Appointment saved = appointmentRepository.save(appointment);
-        return ResponseEntity.created(URI.create("/api/appointments/" + saved.getId()))
-                .body(saved);
+        return ResponseEntity.ok(saved);
     }
 
-    @PutMapping("/{id}/status")
-    public ResponseEntity<Appointment> updateStatus(@PathVariable UUID id,
-            @RequestParam Appointment.AppointmentStatus status) {
+    @PutMapping("/{id}")
+    public ResponseEntity<Appointment> updateAppointment(@PathVariable Long id,
+            @RequestBody AppointmentRequest request) {
         return appointmentRepository.findById(id)
-                .map(appt -> {
-                    appt.setStatus(status);
-                    return ResponseEntity.ok(appointmentRepository.save(appt));
+                .map(appointment -> {
+                    if (request.appointmentDate != null) {
+                        appointment.setAppointmentTime(request.appointmentDate);
+                    }
+                    if (request.status != null) {
+                        appointment.setStatus(Appointment.AppointmentStatus.valueOf(request.status));
+                    }
+                    if (request.notes != null) {
+                        appointment.setNotes(request.notes);
+                    }
+                    return ResponseEntity.ok(appointmentRepository.save(appointment));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAppointment(@PathVariable UUID id) {
-        appointmentRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Void> deleteAppointment(@PathVariable Long id) {
+        if (appointmentRepository.existsById(id)) {
+            appointmentRepository.deleteById(id);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 
-    // DTO for incoming JSON
+    // DTO
     public static class AppointmentRequest {
-        public UUID patientId;
-        public UUID doctorId;
-        public java.time.LocalDateTime appointmentDate;
+        public Long patientId;
+        public Long doctorId;
+        public LocalDateTime appointmentDate;
+        public String status;
         public String notes;
     }
 }

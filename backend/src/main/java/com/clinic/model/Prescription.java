@@ -2,7 +2,6 @@ package com.clinic.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.util.UUID;
 import java.util.Objects;
 
 @Entity
@@ -11,7 +10,7 @@ public class Prescription {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "patient_id", nullable = false)
@@ -43,11 +42,11 @@ public class Prescription {
     }
 
     // Getters and Setters
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

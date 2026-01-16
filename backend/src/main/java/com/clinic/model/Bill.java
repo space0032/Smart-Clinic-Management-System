@@ -3,7 +3,6 @@ package com.clinic.model;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 import java.util.Objects;
 
 @Entity
@@ -12,60 +11,44 @@ public class Bill {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
-
-    @OneToOne
-    @JoinColumn(name = "appointment_id", nullable = false)
-    private Appointment appointment;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "patient_id", nullable = false)
     private Patient patient;
 
-    @Column(nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "appointment_id")
+    private Appointment appointment;
+
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
-    private BillStatus status;
+    @Column(nullable = false)
+    private BillStatus status = BillStatus.PENDING;
 
-    @Column(name = "payment_date")
+    @Column
     private LocalDateTime paymentDate;
 
-    @Column(name = "payment_method")
-    private String paymentMethod;
+    @Column
+    private String description;
 
     public enum BillStatus {
-        PENDING, PAID, OVERDUE
+        PENDING, PAID, CANCELLED
     }
 
+    // Default Constructor
     public Bill() {
     }
 
-    public Bill(UUID id, Appointment appointment, Patient patient, BigDecimal amount, BillStatus status,
-            LocalDateTime paymentDate, String paymentMethod) {
-        this.id = id;
-        this.appointment = appointment;
-        this.patient = patient;
-        this.amount = amount;
-        this.status = status;
-        this.paymentDate = paymentDate;
-        this.paymentMethod = paymentMethod;
-    }
-
-    public UUID getId() {
+    // Getters and Setters
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
-    }
-
-    public Appointment getAppointment() {
-        return appointment;
-    }
-
-    public void setAppointment(Appointment appointment) {
-        this.appointment = appointment;
     }
 
     public Patient getPatient() {
@@ -74,6 +57,14 @@ public class Bill {
 
     public void setPatient(Patient patient) {
         this.patient = patient;
+    }
+
+    public Appointment getAppointment() {
+        return appointment;
+    }
+
+    public void setAppointment(Appointment appointment) {
+        this.appointment = appointment;
     }
 
     public BigDecimal getAmount() {
@@ -100,12 +91,12 @@ public class Bill {
         this.paymentDate = paymentDate;
     }
 
-    public String getPaymentMethod() {
-        return paymentMethod;
+    public String getDescription() {
+        return description;
     }
 
-    public void setPaymentMethod(String paymentMethod) {
-        this.paymentMethod = paymentMethod;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override
@@ -121,14 +112,5 @@ public class Bill {
     @Override
     public int hashCode() {
         return Objects.hash(id);
-    }
-
-    @Override
-    public String toString() {
-        return "Bill{" +
-                "id=" + id +
-                ", amount=" + amount +
-                ", status=" + status +
-                '}';
     }
 }

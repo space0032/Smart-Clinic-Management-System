@@ -1,8 +1,9 @@
 package com.clinic.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDate;
-import java.util.UUID;
 import java.util.Objects;
 
 @Entity
@@ -11,62 +12,39 @@ public class Patient {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    private Long id;
 
-    @Column(name = "user_id")
-    private UUID userId;
-
+    @NotBlank(message = "Name is required")
     @Column(nullable = false)
     private String name;
 
+    @Email(message = "Valid email is required")
+    @Column
     private String email;
 
-    @Column(name = "contact_no")
-    private String contactNo;
+    @Column
+    private String phone;
 
-    @Column(name = "date_of_birth")
-    private LocalDate dateOfBirth;
+    @Column
+    private LocalDate dob;
 
-    private String gender;
-
-    @Column(columnDefinition = "TEXT")
+    @Column
     private String address;
 
-    @Column(name = "medical_history", columnDefinition = "TEXT")
-    private String medicalHistory;
+    @Column
+    private String gender;
 
-    // Constructors
+    // Default Constructor
     public Patient() {
     }
 
-    public Patient(UUID id, UUID userId, String name, String email, String contactNo, LocalDate dateOfBirth,
-            String gender, String address, String medicalHistory) {
-        this.id = id;
-        this.userId = userId;
-        this.name = name;
-        this.email = email;
-        this.contactNo = contactNo;
-        this.dateOfBirth = dateOfBirth;
-        this.gender = gender;
-        this.address = address;
-        this.medicalHistory = medicalHistory;
-    }
-
     // Getters and Setters
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
-    }
-
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public void setUserId(UUID userId) {
-        this.userId = userId;
     }
 
     public String getName() {
@@ -85,28 +63,20 @@ public class Patient {
         this.email = email;
     }
 
-    public String getContactNo() {
-        return contactNo;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setContactNo(String contactNo) {
-        this.contactNo = contactNo;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
-    public LocalDate getDateOfBirth() {
-        return dateOfBirth;
+    public LocalDate getDob() {
+        return dob;
     }
 
-    public void setDateOfBirth(LocalDate dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
+    public void setDob(LocalDate dob) {
+        this.dob = dob;
     }
 
     public String getAddress() {
@@ -117,12 +87,12 @@ public class Patient {
         this.address = address;
     }
 
-    public String getMedicalHistory() {
-        return medicalHistory;
+    public String getGender() {
+        return gender;
     }
 
-    public void setMedicalHistory(String medicalHistory) {
-        this.medicalHistory = medicalHistory;
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     @Override
@@ -138,14 +108,5 @@ public class Patient {
     @Override
     public int hashCode() {
         return Objects.hash(id);
-    }
-
-    @Override
-    public String toString() {
-        return "Patient{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                '}';
     }
 }
