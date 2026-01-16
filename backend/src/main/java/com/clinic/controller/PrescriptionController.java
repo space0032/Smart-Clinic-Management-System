@@ -8,10 +8,13 @@ import com.clinic.repository.PatientRepository;
 import com.clinic.repository.DoctorRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.lang.NonNull;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/prescriptions")
@@ -36,26 +39,26 @@ public class PrescriptionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Prescription> getPrescriptionById(@PathVariable UUID id) {
+    public ResponseEntity<Prescription> getPrescriptionById(@PathVariable @NonNull UUID id) {
         return prescriptionRepository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/patient/{patientId}")
-    public List<Prescription> getPrescriptionsByPatient(@PathVariable UUID patientId) {
+    public List<Prescription> getPrescriptionsByPatient(@PathVariable @NonNull UUID patientId) {
         return prescriptionRepository.findByPatientId(patientId);
     }
 
     @GetMapping("/doctor/{doctorId}")
-    public List<Prescription> getPrescriptionsByDoctor(@PathVariable UUID doctorId) {
+    public List<Prescription> getPrescriptionsByDoctor(@PathVariable @NonNull UUID doctorId) {
         return prescriptionRepository.findByDoctorId(doctorId);
     }
 
     @PostMapping
     public ResponseEntity<Prescription> createPrescription(@RequestBody PrescriptionRequest request) {
-        Patient patient = patientRepository.findById(request.patientId).orElse(null);
-        Doctor doctor = doctorRepository.findById(request.doctorId).orElse(null);
+        Patient patient = patientRepository.findById(Objects.requireNonNull(request.patientId)).orElse(null);
+        Doctor doctor = doctorRepository.findById(Objects.requireNonNull(request.doctorId)).orElse(null);
 
         if (patient == null || doctor == null) {
             return ResponseEntity.badRequest().build();
@@ -72,11 +75,14 @@ public class PrescriptionController {
         prescription.setStatus("ACTIVE");
 
         Prescription saved = prescriptionRepository.save(prescription);
-        return ResponseEntity.ok(saved);
+        return ResponseEntity.ok(
+                Optional.ofNullable(saved)
+                        .orElseThrow(() -> new RuntimeException("Failed to save prescription")));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Prescription> updatePrescription(@PathVariable UUID id,
+    @SuppressWarnings("null")
+    public ResponseEntity<Prescription> updatePrescription(@PathVariable @NonNull UUID id,
             @RequestBody PrescriptionRequest request) {
         return prescriptionRepository.findById(id)
                 .map(prescription -> {
@@ -88,13 +94,15 @@ public class PrescriptionController {
                         prescription.setInstructions(request.instructions);
                     if (request.status != null)
                         prescription.setStatus(request.status);
-                    return ResponseEntity.ok(prescriptionRepository.save(prescription));
+                    return ResponseEntity.ok(
+                            Optional.ofNullable(prescriptionRepository.save(prescription))
+                                    .orElseThrow(() -> new RuntimeException("Failed to save prescription")));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePrescription(@PathVariable UUID id) {
+    public ResponseEntity<Void> deletePrescription(@PathVariable @NonNull UUID id) {
         if (prescriptionRepository.existsById(id)) {
             prescriptionRepository.deleteById(id);
             return ResponseEntity.ok().build();

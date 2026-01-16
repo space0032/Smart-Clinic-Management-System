@@ -8,9 +8,12 @@ import com.clinic.repository.PatientRepository;
 import com.clinic.repository.DoctorRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/appointments")
@@ -35,7 +38,7 @@ public class AppointmentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Appointment> getAppointmentById(@PathVariable UUID id) {
+    public ResponseEntity<Appointment> getAppointmentById(@PathVariable @NonNull UUID id) {
         return appointmentRepository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -43,8 +46,8 @@ public class AppointmentController {
 
     @PostMapping
     public ResponseEntity<Appointment> createAppointment(@RequestBody AppointmentRequest request) {
-        Patient patient = patientRepository.findById(request.patientId).orElse(null);
-        Doctor doctor = doctorRepository.findById(request.doctorId).orElse(null);
+        Patient patient = patientRepository.findById(Objects.requireNonNull(request.patientId)).orElse(null);
+        Doctor doctor = doctorRepository.findById(Objects.requireNonNull(request.doctorId)).orElse(null);
 
         if (patient == null || doctor == null) {
             return ResponseEntity.badRequest().build();
@@ -58,11 +61,14 @@ public class AppointmentController {
         appointment.setReason(request.reason);
         appointment.setNotes(request.notes);
 
-        return ResponseEntity.ok(appointmentRepository.save(appointment));
+        return ResponseEntity.ok(
+                Optional.ofNullable(appointmentRepository.save(appointment))
+                        .orElseThrow(() -> new RuntimeException("Failed to save appointment")));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Appointment> updateAppointment(@PathVariable UUID id,
+    @SuppressWarnings("null")
+    public ResponseEntity<Appointment> updateAppointment(@PathVariable @NonNull UUID id,
             @RequestBody AppointmentRequest request) {
         return appointmentRepository.findById(id)
                 .map(appointment -> {
@@ -74,13 +80,15 @@ public class AppointmentController {
                         appointment.setReason(request.reason);
                     if (request.notes != null)
                         appointment.setNotes(request.notes);
-                    return ResponseEntity.ok(appointmentRepository.save(appointment));
+                    return ResponseEntity.ok(
+                            Optional.ofNullable(appointmentRepository.save(appointment))
+                                    .orElseThrow(() -> new RuntimeException("Failed to save appointment")));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAppointment(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteAppointment(@PathVariable @NonNull UUID id) {
         if (appointmentRepository.existsById(id)) {
             appointmentRepository.deleteById(id);
             return ResponseEntity.ok().build();

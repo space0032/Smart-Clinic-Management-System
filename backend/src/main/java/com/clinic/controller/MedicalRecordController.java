@@ -10,10 +10,12 @@ import com.clinic.repository.MedicalRecordRepository;
 import com.clinic.repository.PatientRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.lang.NonNull;
 
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/medical-records")
@@ -41,15 +43,15 @@ public class MedicalRecordController {
     }
 
     @GetMapping("/patient/{patientId}")
-    public List<MedicalRecord> getRecordsByPatient(@PathVariable UUID patientId) {
+    public List<MedicalRecord> getRecordsByPatient(@PathVariable @NonNull UUID patientId) {
         return medicalRecordRepository.findByPatientId(patientId);
     }
 
     @PostMapping
     public ResponseEntity<MedicalRecord> createMedicalRecord(@RequestBody MedicalRecordRequest request) {
-        Patient patient = patientRepository.findById(request.patientId)
+        Patient patient = patientRepository.findById(Objects.requireNonNull(request.patientId))
                 .orElseThrow(() -> new RuntimeException("Patient not found"));
-        Doctor doctor = doctorRepository.findById(request.doctorId)
+        Doctor doctor = doctorRepository.findById(Objects.requireNonNull(request.doctorId))
                 .orElseThrow(() -> new RuntimeException("Doctor not found"));
 
         MedicalRecord record = new MedicalRecord();
@@ -59,13 +61,13 @@ public class MedicalRecordController {
         record.setPrescription(request.prescription);
 
         if (request.appointmentId != null) {
-            Appointment appointment = appointmentRepository.findById(request.appointmentId)
+            Appointment appointment = appointmentRepository.findById(Objects.requireNonNull(request.appointmentId))
                     .orElse(null); // Optional
             record.setAppointment(appointment);
         }
 
         MedicalRecord saved = medicalRecordRepository.save(record);
-        return ResponseEntity.created(URI.create("/api/medical-records/" + saved.getId()))
+        return ResponseEntity.created(Objects.requireNonNull(URI.create("/api/medical-records/" + saved.getId())))
                 .body(saved);
     }
 

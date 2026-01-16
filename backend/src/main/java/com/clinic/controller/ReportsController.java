@@ -9,7 +9,6 @@ import com.clinic.repository.PatientRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -67,7 +66,6 @@ public class ReportsController {
                 analytics.put("appointmentsByStatus", appointmentsByStatus);
 
                 // Revenue by month (last 6 months)
-                LocalDateTime sixMonthsAgo = LocalDateTime.now().minusMonths(6);
                 List<Map<String, Object>> monthlyRevenue = new ArrayList<>();
 
                 for (int i = 5; i >= 0; i--) {

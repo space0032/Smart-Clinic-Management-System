@@ -4,9 +4,11 @@ import com.clinic.model.Patient;
 import com.clinic.repository.PatientRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/patients")
@@ -25,7 +27,7 @@ public class PatientController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Patient> getPatientById(@PathVariable UUID id) {
+    public ResponseEntity<Patient> getPatientById(@PathVariable @NonNull UUID id) {
         return patientRepository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -33,11 +35,12 @@ public class PatientController {
 
     @PostMapping
     public Patient createPatient(@RequestBody Patient patient) {
-        return patientRepository.save(patient);
+        return Optional.ofNullable(patientRepository.save(patient))
+                .orElseThrow(() -> new RuntimeException("Failed to save patient"));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Patient> updatePatient(@PathVariable UUID id, @RequestBody Patient patientDetails) {
+    public ResponseEntity<Patient> updatePatient(@PathVariable @NonNull UUID id, @RequestBody Patient patientDetails) {
         return patientRepository.findById(id)
                 .map(patient -> {
                     patient.setName(patientDetails.getName());
@@ -49,13 +52,15 @@ public class PatientController {
                     patient.setDateOfBirth(patientDetails.getDateOfBirth());
                     patient.setMedicalHistory(patientDetails.getMedicalHistory());
                     patient.setBloodGroup(patientDetails.getBloodGroup());
-                    return ResponseEntity.ok(patientRepository.save(patient));
+                    return ResponseEntity.ok(
+                            Optional.ofNullable(patientRepository.save(patient))
+                                    .orElseThrow(() -> new RuntimeException("Failed to save patient")));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePatient(@PathVariable UUID id) {
+    public ResponseEntity<Void> deletePatient(@PathVariable @NonNull UUID id) {
         if (patientRepository.existsById(id)) {
             patientRepository.deleteById(id);
             return ResponseEntity.ok().build();

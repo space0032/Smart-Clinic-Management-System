@@ -8,10 +8,13 @@ import com.clinic.repository.PatientRepository;
 import com.clinic.repository.AppointmentRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.lang.NonNull;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/bills")
@@ -36,7 +39,7 @@ public class BillController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Bill> getBillById(@PathVariable UUID id) {
+    public ResponseEntity<Bill> getBillById(@PathVariable @NonNull UUID id) {
         return billRepository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -44,14 +47,14 @@ public class BillController {
 
     @PostMapping
     public ResponseEntity<Bill> createBill(@RequestBody BillRequest request) {
-        Patient patient = patientRepository.findById(request.patientId).orElse(null);
+        Patient patient = patientRepository.findById(Objects.requireNonNull(request.patientId)).orElse(null);
         if (patient == null) {
             return ResponseEntity.badRequest().build();
         }
 
         Appointment appointment = null;
         if (request.appointmentId != null) {
-            appointment = appointmentRepository.findById(request.appointmentId).orElse(null);
+            appointment = appointmentRepository.findById(Objects.requireNonNull(request.appointmentId)).orElse(null);
         }
 
         Bill bill = new Bill();
@@ -62,11 +65,14 @@ public class BillController {
         bill.setIssueDate(LocalDateTime.now());
         bill.setDescription(request.description);
 
-        return ResponseEntity.ok(billRepository.save(bill));
+        return ResponseEntity.ok(
+                Optional.ofNullable(billRepository.save(bill))
+                        .orElseThrow(() -> new RuntimeException("Failed to save bill")));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Bill> updateBill(@PathVariable UUID id, @RequestBody BillRequest request) {
+    @SuppressWarnings("null")
+    public ResponseEntity<Bill> updateBill(@PathVariable @NonNull UUID id, @RequestBody BillRequest request) {
         return billRepository.findById(id)
                 .map(bill -> {
                     if (request.amount != null)
@@ -79,13 +85,15 @@ public class BillController {
                     }
                     if (request.description != null)
                         bill.setDescription(request.description);
-                    return ResponseEntity.ok(billRepository.save(bill));
+                    return ResponseEntity.ok(
+                            Optional.ofNullable(billRepository.save(bill))
+                                    .orElseThrow(() -> new RuntimeException("Failed to save bill")));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBill(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteBill(@PathVariable @NonNull UUID id) {
         if (billRepository.existsById(id)) {
             billRepository.deleteById(id);
             return ResponseEntity.ok().build();
