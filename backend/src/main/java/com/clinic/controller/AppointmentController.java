@@ -68,7 +68,6 @@ public class AppointmentController {
     }
 
     @PutMapping("/{id}")
-    @SuppressWarnings("null")
     public ResponseEntity<Appointment> updateAppointment(@PathVariable @NonNull UUID id,
             @RequestBody @jakarta.validation.Valid AppointmentRequest request) {
         return appointmentRepository.findById(id)
