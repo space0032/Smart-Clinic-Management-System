@@ -11,4 +11,3 @@ export { default as Login } from './Login';
 export { default as Reports } from './Reports';
 export { default as Settings } from './Settings';
 export { default as Prescriptions } from './Prescriptions';
-export { default as PatientPortal } from './PatientPortal';
