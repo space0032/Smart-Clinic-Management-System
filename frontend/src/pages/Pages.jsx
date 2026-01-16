@@ -17,20 +17,10 @@ export const Dashboard = () => (
 
 export { default as Patients } from './Patients';
 export { default as Doctors } from './Doctors';
+export { default as Appointments } from './Appointments';
+export { default as MedicalRecords } from './MedicalRecords';
 
-export const Appointments = () => (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Appointments</h2>
-        <p className="text-gray-500">Calendar view will appear here.</p>
-    </div>
-);
-
-export const Billing = () => (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Billing & Invoices</h2>
-        <p className="text-gray-500">Invoices table will appear here.</p>
-    </div>
-);
+export { default as Billing } from './Billing';
 
 // Exporting pages
 export { default as Login } from './Login';

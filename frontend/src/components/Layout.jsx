@@ -7,8 +7,9 @@ const Layout = () => {
     const navigation = [
         { name: 'Dashboard', href: '/', icon: LayoutDashboard },
         { name: 'Patients', href: '/patients', icon: Users },
-        { name: 'Doctors', href: '/doctors', icon: Users }, // Reusing Users icon for now, or Stethoscope if available
+        { name: 'Doctors', href: '/doctors', icon: Users },
         { name: 'Appointments', href: '/appointments', icon: Calendar },
+        { name: 'Records', href: '/medical-records', icon: FileText },
         { name: 'Billing', href: '/billing', icon: FileText },
         { name: 'Settings', href: '/settings', icon: Settings },
     ];

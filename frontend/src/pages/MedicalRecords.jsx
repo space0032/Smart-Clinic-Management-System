@@ -1,0 +1,218 @@
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Search, FileText, Plus, User } from 'lucide-react';
+
+export default function MedicalRecords() {
+    const [patients, setPatients] = useState([]);
+    const [selectedPatient, setSelectedPatient] = useState(null);
+    const [records, setRecords] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    // Doctors list for the form
+    const [doctors, setDoctors] = useState([]);
+
+    // Form State
+    const [showForm, setShowForm] = useState(false);
+    const [formData, setFormData] = useState({
+        doctorId: '',
+        diagnosis: '',
+        prescription: ''
+    });
+
+    const API_URL = 'http://localhost:8080/api/medical-records';
+    const PATIENTS_URL = 'http://localhost:8080/api/patients';
+    const DOCTORS_URL = 'http://localhost:8080/api/doctors';
+
+    useEffect(() => {
+        fetchPatientsAndDoctors();
+    }, []);
+
+    const fetchPatientsAndDoctors = async () => {
+        try {
+            const [patRes, docRes] = await Promise.all([
+                axios.get(PATIENTS_URL),
+                axios.get(DOCTORS_URL)
+            ]);
+            setPatients(patRes.data);
+            setDoctors(docRes.data);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    };
+
+    const fetchRecords = async (patientId) => {
+        setLoading(true);
+        try {
+            const response = await axios.get(`${API_URL}/patient/${patientId}`);
+            setRecords(response.data);
+        } catch (error) {
+            console.error("Error fetching records:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handlePatientSelect = (patient) => {
+        setSelectedPatient(patient);
+        fetchRecords(patient.id);
+        setShowForm(false);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!selectedPatient) return;
+
+        try {
+            await axios.post(API_URL, {
+                patientId: selectedPatient.id,
+                ...formData
+            });
+            setShowForm(false);
+            setFormData({ doctorId: '', diagnosis: '', prescription: '' });
+            fetchRecords(selectedPatient.id);
+        } catch (error) {
+            console.error("Error adding record:", error);
+            alert("Failed to add record");
+        }
+    };
+
+    const filteredPatients = patients.filter(p =>
+        p.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    return (
+        <div className="flex h-[calc(100vh-8rem)] gap-6">
+
+            {/* Patient List Sidebar */}
+            <div className="w-1/3 bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col">
+                <div className="p-4 border-b border-gray-100">
+                    <h2 className="text-lg font-semibold text-gray-800 mb-3">Select Patient</h2>
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <input
+                            type="text"
+                            placeholder="Search..."
+                            className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                </div>
+                <div className="flex-1 overflow-y-auto p-2">
+                    {filteredPatients.map(patient => (
+                        <div
+                            key={patient.id}
+                            onClick={() => handlePatientSelect(patient)}
+                            className={`p-3 mb-2 rounded-lg cursor-pointer flex items-center transition-colors ${selectedPatient?.id === patient.id ? 'bg-indigo-50 border-indigo-200' : 'hover:bg-gray-50'}`}
+                        >
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${selectedPatient?.id === patient.id ? 'bg-indigo-200 text-indigo-700' : 'bg-gray-200 text-gray-600'}`}>
+                                <User className="w-4 h-4" />
+                            </div>
+                            <div>
+                                <h3 className={`text-sm font-medium ${selectedPatient?.id === patient.id ? 'text-indigo-900' : 'text-gray-700'}`}>{patient.name}</h3>
+                                <p className="text-xs text-gray-500">{patient.contactNo}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Medical Records View */}
+            <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col">
+                {!selectedPatient ? (
+                    <div className="flex-1 flex flex-col items-center justify-center text-gray-400">
+                        <FileText className="w-12 h-12 mb-2 opacity-50" />
+                        <p>Select a patient to view medical records</p>
+                    </div>
+                ) : (
+                    <>
+                        <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+                            <div>
+                                <h2 className="text-xl font-bold text-gray-900">{selectedPatient.name}</h2>
+                                <p className="text-sm text-gray-500">Medical History & Prescriptions</p>
+                            </div>
+                            <button
+                                onClick={() => setShowForm(!showForm)}
+                                className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                            >
+                                <Plus className="w-4 h-4 mr-2" />
+                                Add Record
+                            </button>
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+                            {showForm && (
+                                <div className="bg-white p-6 rounded-xl shadow-sm border border-indigo-100 mb-6">
+                                    <h3 className="font-semibold text-gray-800 mb-4">New Medical Entry</h3>
+                                    <form onSubmit={handleSubmit} className="space-y-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Diagnosing Doctor</label>
+                                            <select
+                                                required
+                                                className="w-full p-2 border rounded-lg"
+                                                value={formData.doctorId}
+                                                onChange={e => setFormData({ ...formData, doctorId: e.target.value })}
+                                            >
+                                                <option value="">Select Doctor</option>
+                                                {doctors.map(d => (
+                                                    <option key={d.id} value={d.id}>{d.name} ({d.specialization})</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Diagnosis</label>
+                                            <textarea
+                                                required
+                                                className="w-full p-2 border rounded-lg h-20"
+                                                placeholder="Enter clinical diagnosis..."
+                                                value={formData.diagnosis}
+                                                onChange={e => setFormData({ ...formData, diagnosis: e.target.value })}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Prescription</label>
+                                            <textarea
+                                                className="w-full p-2 border rounded-lg h-20"
+                                                placeholder="Medications, dosage, instructions..."
+                                                value={formData.prescription}
+                                                onChange={e => setFormData({ ...formData, prescription: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="flex justify-end gap-2">
+                                            <button type="button" onClick={() => setShowForm(false)} className="px-3 py-1.5 text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
+                                            <button type="submit" className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Save Record</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            )}
+
+                            {loading ? (
+                                <p className="text-center text-gray-500 mt-10">Loading history...</p>
+                            ) : records.length === 0 ? (
+                                <p className="text-center text-gray-500 mt-10">No medical records found for this patient.</p>
+                            ) : (
+                                <div className="space-y-4">
+                                    {records.map(record => (
+                                        <div key={record.id} className="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
+                                            <div className="flex justify-between items-start mb-3">
+                                                <h4 className="text-blue-600 font-semibold text-lg">{record.diagnosis}</h4>
+                                                <span className="text-xs text-gray-400">
+                                                    {new Date(record.createdAt).toLocaleDateString()}
+                                                </span>
+                                            </div>
+                                            <p className="text-gray-700 mb-3 text-sm">{record.prescription}</p>
+                                            <div className="pt-3 border-t border-gray-50 flex items-center text-xs text-gray-500">
+                                                <span className="bg-gray-100 px-2 py-1 rounded">Dr. {record.doctor?.name}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </>
+                )}
+            </div>
+        </div>
+    );
+}
